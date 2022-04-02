@@ -1,7 +1,7 @@
 import { getFinishEvent } from "./helpers";
 import { getEventDuration } from "./earliestPossible";
 
-export function getLatestPossible(graph, ranking, erlPoss) {
+export function getLatestPossible(graph, ranking, erlPoss, durations) {
   const serializedGraph = graph.serialize();
   const finishEvent = getFinishEvent(serializedGraph);
   const ltsPoss = {};
@@ -16,7 +16,8 @@ export function getLatestPossible(graph, ranking, erlPoss) {
           const outgoingNodes = graph.adjacent(event);
           const possibleTimings = outgoingNodes.map((outgoingNode) => {
             const eventDuration = getEventDuration(
-              graph.getEdgeWeight(event, outgoingNode)
+              graph.getEdgeWeight(event, outgoingNode),
+              durations
             );
             return ltsPoss[outgoingNode] - eventDuration;
           });

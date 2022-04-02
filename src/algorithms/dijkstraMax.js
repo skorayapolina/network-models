@@ -1,7 +1,7 @@
 import {getEventDuration} from './earliestPossible';
 import {getFinishEvent} from './helpers';
 
-function generateDataForDijkstra(graph) {
+function generateDataForDijkstra(graph, durations) {
   const serializedGraph = graph.serialize();
   const graphForDijkstra = {};
   const costs = {};
@@ -13,7 +13,7 @@ function generateDataForDijkstra(graph) {
   })
 
   serializedGraph.links.forEach(link => {
-    graphForDijkstra[link.source][link.target] = (-1)*getEventDuration(link.weight);
+    graphForDijkstra[link.source][link.target] = (-1)*getEventDuration(link.weight, durations);
   });
 
   // fill costs and parents

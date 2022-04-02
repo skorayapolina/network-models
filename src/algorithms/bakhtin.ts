@@ -189,7 +189,7 @@ export function createNetworkModel(pred) {
   };
 
   const joinStartEvents = () => {
-    const startEdges = [];
+    const startEdges: Array<{source: string, target: string[]}> = [];
     graph.nodes().forEach((node) => {
       const pred = getIncomingEdges(graph, node);
 
@@ -247,7 +247,7 @@ export function createNetworkModel(pred) {
   };
 
   const joinEndEvents = () => {
-    const endNodes = [];
+    const endNodes: any[] = [];
     graph.nodes().forEach((node) => {
       if (graph.adjacent(node).length === 0) {
         endNodes.push(node);

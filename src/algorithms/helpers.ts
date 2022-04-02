@@ -24,7 +24,7 @@ export const getIncomingEdges = (graph, target) => {
 };
 
 export const getVerticesWithOnlyFictitiousOutgoingEdges = (graph) => {
-  const vertices = [];
+  const vertices: any[] = [];
 
   graph.nodes().forEach((node) => {
     const adjacentNodes = graph.adjacent(node);
@@ -51,7 +51,7 @@ export const getVerticesWithOnlyFictitiousOutgoingEdges = (graph) => {
 };
 
 export const getVerticesWithOnlyFictitiousIncomingEdges = (graph) => {
-  const vertices = [];
+  const vertices: any = [];
 
   graph.nodes().forEach((node) => {
     const incomingEdges = getIncomingEdges(graph, node);
@@ -79,7 +79,7 @@ export const getVerticesWithOnlyFictitiousIncomingEdges = (graph) => {
 
 export const search = (targetGraph, source, target) => {
   let searchQueue = targetGraph.adjacent(source);
-  const searched = [];
+  const searched: any[] = [];
 
   while (Boolean(searchQueue.length)) {
     const node = searchQueue.shift();

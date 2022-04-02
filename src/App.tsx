@@ -22,8 +22,8 @@ const computeModel = (
   const ranking = rankingEvents(getGraphCopy(graph));
 
   const erlPoss = getEarliestPossible(graph, ranking, durations);
-  const criticalPath = findCriticalPath(graph, erlPoss);
-  const ltsPoss = getLatestPossible(graph, ranking, erlPoss);
+  const criticalPath = findCriticalPath(graph, erlPoss, durations);
+  const ltsPoss = getLatestPossible(graph, ranking, erlPoss, durations);
 
   return [graph, erlPoss, criticalPath, ltsPoss];
 };
@@ -32,7 +32,8 @@ const createGraphView = (
   graph: any,
   erlPoss: object,
   criticalPath: string[],
-  ltsPoss: object
+  ltsPoss: object,
+  durations
 ) => {
   const graphLinks = graph.serialize().links;
   return {
@@ -48,7 +49,7 @@ const createGraphView = (
       return {
         from: link.source,
         to: link.target,
-        label: `${getEventDuration(link.weight)} (${link.weight})`,
+        label: `${getEventDuration(link.weight, durations)} (${link.weight})`,
         ...(link.weight ? {} : { dashes: true }),
         ...(indexOfLinkSourceInCriticalPath >= 0 &&
         criticalPath[indexOfLinkSourceInCriticalPath + 1] === link.target
@@ -88,7 +89,7 @@ function App() {
   };
 
   const onCreateModelClick = () => {
-    createGraphView(...computeModel(predNodes, durations));
+    console.log(createGraphView(...computeModel(testPredNodes, testDurations), testDurations));
   };
 
   useEffect(() => {
@@ -107,8 +108,6 @@ function App() {
     setPredNodesInput(initPredNodesInput);
     setNodesArray(Array.from({ length: worksCount }, (_, i) => i + 1));
   }, [worksCount]);
-
-  console.log(durations);
 
   return (
     <div className="App">
@@ -165,5 +164,31 @@ function App() {
     </div>
   );
 }
+
+const testDurations = {
+  1: 2,
+  2: 5,
+  3: 3,
+  4: 2,
+  5: 1,
+  6: 4,
+  7: 4,
+  8: 2,
+  9: 2,
+  10: 5,
+};
+
+const testPredNodes = {
+  1: [5, 8],
+  2: [9, 10],
+  3: [],
+  4: [2, 5, 8],
+  5: [3],
+  6: [1, 7],
+  7: [2, 5, 8],
+  8: [9, 10],
+  9: [],
+  10: [3],
+};
 
 export default App;

@@ -1,10 +1,10 @@
-import { getIncomingEdges} from './helpers';
+import { getIncomingEdges} from 'algorithms/helpers';
 
-export function getEventDuration(durations, eventNumber) {
+export function getEventDuration(eventNumber, durations) {
   if (eventNumber === 0) {
     return 0;
   }
-  return duration[eventNumber];
+  return durations[eventNumber];
 }
 
 export  function getEarliestPossible(graph, ranking, durations) {
@@ -17,7 +17,7 @@ export  function getEarliestPossible(graph, ranking, durations) {
       } else  {
         const incomingEdges = getIncomingEdges(graph, event);
         const possibleTimings = incomingEdges.map(incomingEdge => {
-          const eventDuration = getEventDuration(durations, graph.getEdgeWeight(incomingEdge.source, event));
+          const eventDuration = getEventDuration(graph.getEdgeWeight(incomingEdge.source, event), durations);
           return erlPoss[incomingEdge.source] + eventDuration;
         })
         erlPoss[event] = Math.max(...possibleTimings);

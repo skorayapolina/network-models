@@ -2,7 +2,7 @@ import {getIncomingEdges} from './helpers';
 
 export const rankingEvents = graph => {
   const ranking = {};
-  const ranked = [];
+  const ranked: any[] = [];
   const numberOfNodes = graph.nodes().length;
 
   graph.nodes().forEach(node => {
