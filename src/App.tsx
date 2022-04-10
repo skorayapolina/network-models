@@ -1,5 +1,5 @@
 import React, { ChangeEvent, useEffect, useState } from "react";
-import "./App.css";
+import Graph from "react-graph-vis";
 import { createNetworkModel } from "algorithms/bakhtin";
 import { getMapToRename, rankingEvents } from "algorithms/ranking";
 import { getGraphCopy } from "algorithms/helpers";
@@ -10,6 +10,25 @@ import {
 } from "algorithms/earliestPossible";
 import { findCriticalPath } from "algorithms/findCriticalPath";
 import { getLatestPossible } from "algorithms/latestPossible";
+import "./App.css";
+import { GanttChart } from "components/GanttChart/GanttChart";
+
+const options = {
+  nodes: {
+    color: "rgb(136,169,229)",
+  },
+  edges: {
+    color: {
+      inherit: false,
+    },
+    smooth: {
+      type: "vertical",
+      forceDirection: "none",
+      roundness: 0.25,
+    },
+  },
+  height: "600px",
+};
 
 const computeModel = (
   predNodes,
@@ -46,15 +65,27 @@ const createGraphView = (
       const indexOfLinkSourceInCriticalPath = criticalPath.findIndex(
         (value) => value === link.source
       );
+      const isOnCriticalPass =
+        indexOfLinkSourceInCriticalPath >= 0 &&
+        criticalPath[indexOfLinkSourceInCriticalPath + 1] === link.target;
+      const eventDuration = getEventDuration(link.weight, durations);
       return {
         from: link.source,
         to: link.target,
-        label: `${getEventDuration(link.weight, durations)} (${link.weight})`,
+        label: `${eventDuration} (${link.weight})`,
         ...(link.weight ? {} : { dashes: true }),
-        ...(indexOfLinkSourceInCriticalPath >= 0 &&
-        criticalPath[indexOfLinkSourceInCriticalPath + 1] === link.target
-          ? { color: "rgb(197,13,255)" }
-          : {}),
+        ...(isOnCriticalPass ? { color: "rgb(197,13,255)" } : {}),
+        payload: {
+          jobNumber: link.weight,
+          resources: testResources[link.weight],
+          isOnCriticalPass,
+          start: erlPoss[link.source],
+          factStart: erlPoss[link.source],
+          end: ltsPoss[link.target],
+          duration: eventDuration,
+          from: link.source,
+          to: link.target,
+        },
       };
     }),
   };
@@ -68,6 +99,7 @@ function App() {
   const [predNodesInput, setPredNodesInput] = useState<{
     [key: string]: string;
   }>({});
+  const [graphView, setGraphView] = useState<any>(null);
 
   const onWorksCountChange = (event: ChangeEvent<HTMLInputElement>) => {
     setWorksCount(Number(event.target.value));
@@ -89,7 +121,12 @@ function App() {
   };
 
   const onCreateModelClick = () => {
-    console.log(createGraphView(...computeModel(testPredNodes, testDurations), testDurations));
+    setGraphView(
+      createGraphView(
+        ...computeModel(testPredNodes, testDurations),
+        testDurations
+      )
+    );
   };
 
   useEffect(() => {
@@ -160,10 +197,39 @@ function App() {
           </tbody>
         </table>
         <button onClick={onCreateModelClick}>Построить модель</button>
+
+        {graphView && (
+          <>
+            <GanttChart
+              chartData={graphView.edges
+                .map((edge) => edge.payload)
+                .sort((a, b) => {
+                  return Number(b.from.at(1)) - Number(a.from.at(1));
+                })
+                .sort((a, b) => {
+                  return a.isOnCriticalPass - b.isOnCriticalPass;
+                })}
+            />
+
+            <Graph graph={graphView} options={options} />
+          </>
+        )}
       </main>
     </div>
   );
 }
+const testResources = {
+  1: 7,
+  2: 7,
+  3: 1,
+  4: 5,
+  5: 9,
+  6: 2,
+  7: 3,
+  8: 8,
+  9: 1,
+  10: 8,
+};
 
 const testDurations = {
   1: 2,
