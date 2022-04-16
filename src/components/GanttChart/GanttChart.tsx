@@ -1,7 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import "./GanttChart.css";
-
-const time = 24;
 
 export type IChartData = IEdgePayload[];
 
@@ -23,6 +21,7 @@ interface IJobsCell {
   startEvent: string;
   endEvent: string;
   resources: number;
+  hasAdditionalTime?: boolean;
 }
 
 export const GanttChart = ({ chartData }: { chartData: IChartData }) => {
@@ -32,23 +31,31 @@ export const GanttChart = ({ chartData }: { chartData: IChartData }) => {
   );
   const [resourcesSum, setResourcesSum] = useState<number[]>([]);
   const [resourcesAxis, setResourcesAxis] = useState<number[]>([]);
-  const timeAxis = Array.from({ length: time }, (_, i) => i);
+  const [additionalTime, setAdditionalTime] = useState<number>(0);
+  const timeAxis = useMemo<number[]>(() => {
+    const time = Math.max(...chartData.map(job => job.end)) + additionalTime + 2;
+    return Array.from({ length: time }, (_, i) => i);
+  }, [additionalTime]);
 
   useEffect(() => {
     // init chart data
-    const newChartDataMap = new Map();
+    const newChartDataMap = new Map<number, IJobsCell[]>();
 
     chartDataState.forEach((job) => {
       newChartDataMap.set(
         job.jobNumber,
         timeAxis.map((el) => {
-          const hasJob = el > job.factStart && el <= job.factStart + job.duration;
+          const hasJob =
+            el > job.factStart && el <= job.factStart + job.duration;
 
           return {
             hasJob,
             hasJobOffset: el > job.start && el <= job.end,
+            hasAdditionalTime: el > job.end && el <= job.end + additionalTime,
             startEvent: (
-              job.duration === 0 ? el === job.factStart : el === job.factStart + 1
+              job.duration === 0
+                ? el === job.factStart
+                : el === job.factStart + 1
             )
               ? job.from
               : "",
@@ -59,7 +66,7 @@ export const GanttChart = ({ chartData }: { chartData: IChartData }) => {
       );
     });
     setChartDataMap(newChartDataMap);
-  }, [chartDataState]);
+  }, [chartDataState, additionalTime]);
 
   useEffect(() => {
     // init resources
@@ -76,77 +83,99 @@ export const GanttChart = ({ chartData }: { chartData: IChartData }) => {
       }
       setResourcesSum(sumArray);
     }
-    console.log("chartDataMap changed");
   }, [chartDataMap]);
 
   useEffect(() => {
     setResourcesAxis(
       Array.from({ length: Math.max(...resourcesSum) + 1 }, (_, i) => i)
     );
-    console.log("resourcesSum changed", resourcesSum);
   }, [resourcesSum]);
 
-  useEffect(() => {
-    setTimeout(() => {
+  const moveJob =
+    (jobNumber: number, step = 1) =>
+    () => {
       setChartDataState(
         chartDataState.map((it) => {
-          if (it.jobNumber === 8) {
-            return { ...it, factStart: 10};
+          if (it.jobNumber === jobNumber) {
+            return { ...it, factStart: it.factStart + step };
           }
           return it;
         })
       );
-    }, 2000);
-  }, [])
+    };
+
+  const changeAdditionalTime = (step: number) => () => {
+      setAdditionalTime(additionalTime + step);
+  };
 
   return (
-    <div className="gantt-chart">
-      {Array.from(chartDataMap.entries()).map(([number, data], i) => (
-        <React.Fragment key={i}>
-          <div className="gant-row-job">Job {number}</div>
-          <div className="gant-row-period">
-            {data.map((timeElem, j) => (
-              <div
-                key={j}
-                className="gant-row-item"
-                data-startevent={timeElem.startEvent}
-                data-endevent={timeElem.endEvent}
-              >
-                {timeElem.hasJob && <div className="item-job" />}
-                {timeElem.hasJobOffset && <div className="item-job-offset" />}
-              </div>
-            ))}
-          </div>
-        </React.Fragment>
-      ))}
-      <div className="gant-row-job">time line</div>
-      <div className="gant-row-period">
-        {timeAxis.map((time) => (
-          <div key={time} className="gant-row-item">
-            {time}
-          </div>
+    <>
+      <div>
+        <button onClick={changeAdditionalTime(-1)}>-</button>
+        <span>Additional time: {additionalTime}</span>
+        <button onClick={changeAdditionalTime(1)}>+</button>
+      </div>
+      <div className="gantt-chart">
+        {Array.from(chartDataMap.entries()).map(([number, data], i) => (
+          <React.Fragment key={i}>
+            <div className="gant-row-job">
+              <button onClick={moveJob(number, -1)}>-</button>
+              <span>Job {number}</span>
+              <button onClick={moveJob(number)}>+</button>
+            </div>
+            <div className="gant-row-period">
+              {data.map((timeElem, j) => (
+                <div
+                  key={j}
+                  className="gant-row-item"
+                  data-startevent={timeElem.startEvent}
+                  data-endevent={timeElem.endEvent}
+                >
+                  {timeElem.hasJob && (
+                    <div className="item-job">
+                      {timeElem.startEvent && (
+                        <span className="item-job-res">{timeElem.resources}</span>
+                      )}
+                    </div>
+                  )}
+                  {timeElem.hasJobOffset && <div className="item-job-offset" />}
+                  {timeElem.hasAdditionalTime && (
+                    <div className="item-job-additionaltime" />
+                  )}
+                </div>
+              ))}
+            </div>
+          </React.Fragment>
+        ))}
+        <div className="gant-row-job">time line</div>
+        <div className="gant-row-period">
+          {timeAxis.map((time) => (
+            <div key={time} className="gant-row-item">
+              {time}
+            </div>
+          ))}
+        </div>
+        {resourcesAxis.map((cell) => (
+          <React.Fragment key={cell}>
+            <div className="gant-row-job">{cell}</div>
+            <div className="gant-row-period">
+              {timeAxis.map((timeCell) => {
+                const isResourceLevel =
+                  resourcesSum[timeCell] === cell && resourcesSum[timeCell] !== 0;
+
+                return (
+                  <div
+                    key={timeCell}
+                    className={`gant-row-item ${isResourceLevel && "res-level"}`}
+                  >
+                    {isResourceLevel && resourcesSum[timeCell]}
+                  </div>
+                );
+              })}
+            </div>
+          </React.Fragment>
         ))}
       </div>
-      {resourcesAxis.map((cell) => (
-        <React.Fragment key={cell}>
-          <div className="gant-row-job">{cell}</div>
-          <div className="gant-row-period">
-            {timeAxis.map((timeCell) => {
-              const isResourceLevel =
-                resourcesSum[timeCell] === cell && resourcesSum[timeCell] !== 0;
-
-              return (
-                <div
-                  key={timeCell}
-                  className={`gant-row-item ${isResourceLevel && "res-level"}`}
-                >
-                  {isResourceLevel && resourcesSum[timeCell]}
-                </div>
-              );
-            })}
-          </div>
-        </React.Fragment>
-      ))}
-    </div>
+    </>
   );
 };

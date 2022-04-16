@@ -1,0 +1,7 @@
+.wrapper {
+  display: flex;
+}
+
+td input {
+  width: 100%;
+}

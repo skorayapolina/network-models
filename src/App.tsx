@@ -27,7 +27,7 @@ const options = {
       roundness: 0.25,
     },
   },
-  height: "600px",
+  height: "280px",
 };
 
 const computeModel = (
@@ -52,7 +52,8 @@ const createGraphView = (
   erlPoss: object,
   criticalPath: string[],
   ltsPoss: object,
-  durations
+  durations,
+  resources
 ) => {
   const graphLinks = graph.serialize().links;
   return {
@@ -77,7 +78,7 @@ const createGraphView = (
         ...(isOnCriticalPass ? { color: "rgb(197,13,255)" } : {}),
         payload: {
           jobNumber: link.weight,
-          resources: testResources[link.weight],
+          resources: resources[link.weight],
           isOnCriticalPass,
           start: erlPoss[link.source],
           factStart: erlPoss[link.source],
@@ -95,6 +96,7 @@ function App() {
   const [worksCount, setWorksCount] = useState(10);
   const [nodesArray, setNodesArray] = useState<number[]>([]);
   const [durations, setDurations] = useState<{ [key: string]: number }>({});
+  const [resources, setResources] = useState<{ [key: string]: number }>({});
   const [predNodes, setPredNodes] = useState<{ [key: string]: number[] }>({});
   const [predNodesInput, setPredNodesInput] = useState<{
     [key: string]: string;
@@ -108,6 +110,11 @@ function App() {
   const onDurationChange = (event: ChangeEvent<HTMLInputElement>) => {
     const target = event.target;
     setDurations({ ...durations, [target.name]: Number(target.value) });
+  };
+
+  const onResourcesChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const target = event.target;
+    setResources({ ...resources, [target.name]: Number(target.value) });
   };
 
   const onPredNodesChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -124,7 +131,8 @@ function App() {
     setGraphView(
       createGraphView(
         ...computeModel(testPredNodes, testDurations),
-        testDurations
+        testDurations,
+        testResources
       )
     );
   };
@@ -160,17 +168,19 @@ function App() {
           />
         </div>
 
-        <table>
-          <thead>
+        <div className="wrapper">
+          <table>
+            <thead>
             <tr>
               <th>Номер работы</th>
               <th>Сроки выполнения</th>
               <th>
                 Каким работам предшествует <br /> (через запятую)
               </th>
+              <th>Ресурсы</th>
             </tr>
-          </thead>
-          <tbody>
+            </thead>
+            <tbody>
             {nodesArray.map((node) => (
               <tr key={node}>
                 <td>{node}</td>
@@ -192,32 +202,40 @@ function App() {
                     autoComplete="off"
                   />
                 </td>
+                <td>
+                  <input
+                    type="text"
+                    name={`${node}`}
+                    value={resources[node] || ""}
+                    onChange={onResourcesChange}
+                    autoComplete="off"
+                  />
+                </td>
               </tr>
             ))}
-          </tbody>
-        </table>
+            </tbody>
+          </table>
+          {graphView && <Graph graph={graphView} options={options} />}
+        </div>
+
         <button onClick={onCreateModelClick}>Построить модель</button>
-
         {graphView && (
-          <>
-            <GanttChart
-              chartData={graphView.edges
-                .map((edge) => edge.payload)
-                .sort((a, b) => {
-                  return Number(b.from.at(1)) - Number(a.from.at(1));
-                })
-                .sort((a, b) => {
-                  return a.isOnCriticalPass - b.isOnCriticalPass;
-                })}
-            />
-
-            <Graph graph={graphView} options={options} />
-          </>
+          <GanttChart
+            chartData={graphView.edges
+              .map((edge) => edge.payload)
+              .sort((a, b) => {
+                return Number(b.from.at(1)) - Number(a.from.at(1));
+              })
+              .sort((a, b) => {
+                return a.isOnCriticalPass - b.isOnCriticalPass;
+              })}
+          />
         )}
       </main>
     </div>
   );
 }
+
 const testResources = {
   1: 7,
   2: 7,
