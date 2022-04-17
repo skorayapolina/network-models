@@ -42,7 +42,7 @@ export const getVerticesWithOnlyFictitiousOutgoingEdges = (graph) => {
     ) {
       vertices.push({
         node,
-        adjacentNodes: graph.adjacent(node).toString(),
+        adjacentNodes: graph.adjacent(node).sort().toString(),
       });
     }
   });

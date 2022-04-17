@@ -10,10 +10,13 @@ import {
 } from "algorithms/earliestPossible";
 import { findCriticalPath } from "algorithms/findCriticalPath";
 import { getLatestPossible } from "algorithms/latestPossible";
-import "./App.css";
 import { GanttChart } from "components/GanttChart/GanttChart";
+import "./App.css";
 
 const options = {
+  physics: {
+    enabled: false
+  },
   nodes: {
     color: "rgb(136,169,229)",
   },
@@ -30,7 +33,7 @@ const options = {
   height: "280px",
 };
 
-const computeModel = (
+export const computeModel = (
   predNodes,
   durations
 ): [graph: any, erlPoss: object, criticalPath: string[], ltsPoss: object] => {
@@ -59,7 +62,7 @@ const createGraphView = (
   return {
     nodes: graph.nodes().map((node) => ({
       id: node,
-      label: `${node} erl: ${erlPoss[node]};`,
+      label: `${node}`,
       title: `erlPoss: ${erlPoss[node]}; ltsPoss: ${ltsPoss[node]}`,
     })),
     edges: graphLinks.map((link) => {

@@ -147,6 +147,15 @@ export function createNetworkModel(pred) {
         ) {
           const incomingEdges = getIncomingEdges(graph, node);
 
+          // если хоть одно такое ребро уже существует, то не склеивать
+          if (
+            incomingEdges.some((incomingEdge) =>
+              isEdgeExist(graph, incomingEdge.source, adjNode)
+            )
+          ) {
+            return;
+          }
+
           incomingEdges.forEach((incomingEdge) => {
             graph.addEdge(incomingEdge.source, adjNode, incomingEdge.weight);
           });
@@ -189,7 +198,7 @@ export function createNetworkModel(pred) {
   };
 
   const joinStartEvents = () => {
-    const startEdges: Array<{source: string, target: string[]}> = [];
+    const startEdges: Array<{ source: string; target: string[] }> = [];
     graph.nodes().forEach((node) => {
       const pred = getIncomingEdges(graph, node);
 

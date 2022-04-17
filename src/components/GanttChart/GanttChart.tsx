@@ -111,16 +111,16 @@ export const GanttChart = ({ chartData }: { chartData: IChartData }) => {
   return (
     <>
       <div>
-        <button onClick={changeAdditionalTime(-1)}>-</button>
         <span>Additional time: {additionalTime}</span>
+        <button onClick={changeAdditionalTime(-1)}>-</button>
         <button onClick={changeAdditionalTime(1)}>+</button>
       </div>
       <div className="gantt-chart">
         {Array.from(chartDataMap.entries()).map(([number, data], i) => (
           <React.Fragment key={i}>
             <div className="gant-row-job">
-              <button onClick={moveJob(number, -1)}>-</button>
               <span>Job {number}</span>
+              <button onClick={moveJob(number, -1)}>-</button>
               <button onClick={moveJob(number)}>+</button>
             </div>
             <div className="gant-row-period">

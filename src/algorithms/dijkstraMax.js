@@ -27,8 +27,8 @@ function generateDataForDijkstra(graph, durations) {
   return [graphForDijkstra, costs, parents];
 }
 
-export function dijkstraMax(graph) {
-  const [graphForDijkstra, costs, parents] = generateDataForDijkstra(graph);
+export function dijkstraMax(graph, durations) {
+  const [graphForDijkstra, costs, parents] = generateDataForDijkstra(graph, durations);
   let processed = [];
 
   const findLowestCostNode = costs => {

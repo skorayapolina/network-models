@@ -22,6 +22,7 @@
 }
 
 .gant-row-item::before {
+  z-index: 1;
   content: attr(data-startevent);
   position: absolute;
   top: 0;
@@ -29,6 +30,7 @@
 }
 
 .gant-row-item::after {
+  z-index: 1;
   content: attr(data-endevent);
   position: absolute;
   top: 0;
