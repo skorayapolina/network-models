@@ -1,7 +1,107 @@
-.wrapper {
-  display: flex;
+.app {
+  color: var(--color-font);
+  min-height: 100vh;
+  background-color: var(--color-layout-bg);
+  padding: 0 4vw 2rem 4vw;
 }
 
-td input {
+.app-title {
+  padding: 1.8rem 0;
+  font-size: 2.4rem;
+}
+
+.input-wrapper-jobs {
+  margin-bottom: 1rem;
+}
+.input-wrapper-jobs label {
+  margin-right: 8px;
+}
+
+/* table */
+
+.table-wrapper {
   width: 100%;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  background-color: #fff;
+  box-shadow: var(--shadow-table);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.thead::after {
+  height: 1rem;
+  display: table-row;
+  content: '';
+}
+
+.thead-row {
+
+}
+
+.tbody {
+
+}
+
+.thead-data {
+  margin-bottom: 1rem;
+  background-color: #F4F2FF;
+}
+.thead-data:first-child {
+  border-radius: 8px 0 0 8px;
+}
+.thead-data:last-child {
+  border-radius: 0 8px 8px 0;
+}
+
+.tbody-data, .thead-data {
+  padding: 0.2rem;
+}
+
+.tbody-row {
+  transition: background-color var(--base-transition);
+}
+.tbody-row:hover {
+  background-color: var(--color-table-row-hover);
+}
+.tbody-row:focus-within {
+  background-color: var(--color-table-row-focus);
+}
+
+.tbody-data:first-child {
+  border-radius: 2px 0 0 2px;
+}
+.tbody-data:last-child {
+  border-radius: 0 2px 2px 0;
+}
+
+.tbody-data input {
+  width: 100%;
+}
+
+.data-number {
+  text-align: center;
+}
+
+/* button */
+.button-wrapper {
+  text-align: right;
+  margin-bottom: 3rem;
+}
+
+.graph-wrapper {
+  margin-bottom: 3rem;
+  border-radius: 8px;
+  background-color: #fff;
+  box-shadow: var(--shadow-table);
+}
+
+.graph-wrapper .vis-network:focus {
+  outline: none;
+  border-radius: 8px;
+  box-shadow: var(--shadow-input-focus);
 }

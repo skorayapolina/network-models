@@ -33,7 +33,8 @@ export const GanttChart = ({ chartData }: { chartData: IChartData }) => {
   const [resourcesAxis, setResourcesAxis] = useState<number[]>([]);
   const [additionalTime, setAdditionalTime] = useState<number>(0);
   const timeAxis = useMemo<number[]>(() => {
-    const time = Math.max(...chartData.map(job => job.end)) + additionalTime + 2;
+    const time =
+      Math.max(...chartData.map((job) => job.end)) + additionalTime + 2;
     return Array.from({ length: time }, (_, i) => i);
   }, [additionalTime]);
 
@@ -105,23 +106,44 @@ export const GanttChart = ({ chartData }: { chartData: IChartData }) => {
     };
 
   const changeAdditionalTime = (step: number) => () => {
-      setAdditionalTime(additionalTime + step);
+    setAdditionalTime(additionalTime + step);
   };
 
   return (
     <>
-      <div>
-        <span>Additional time: {additionalTime}</span>
-        <button onClick={changeAdditionalTime(-1)}>-</button>
-        <button onClick={changeAdditionalTime(1)}>+</button>
+      <div className="add-time-wrapper">
+        <span>Дополнительное время: </span>
+        <button
+          className="button button-square"
+          onClick={changeAdditionalTime(-1)}
+        >
+          -
+        </button>
+        <div className="add-time-value">{additionalTime}</div>
+        <button
+          className="button button-square"
+          onClick={changeAdditionalTime(1)}
+        >
+          +
+        </button>
       </div>
       <div className="gantt-chart">
         {Array.from(chartDataMap.entries()).map(([number, data], i) => (
           <React.Fragment key={i}>
             <div className="gant-row-job">
-              <span>Job {number}</span>
-              <button onClick={moveJob(number, -1)}>-</button>
-              <button onClick={moveJob(number)}>+</button>
+              <span className="job-label">Job {number}</span>
+              <button
+                className="button button-square button-chart"
+                onClick={moveJob(number, -1)}
+              >
+                -
+              </button>
+              <button
+                className="button button-square button-chart"
+                onClick={moveJob(number)}
+              >
+                +
+              </button>
             </div>
             <div className="gant-row-period">
               {data.map((timeElem, j) => (
@@ -134,7 +156,9 @@ export const GanttChart = ({ chartData }: { chartData: IChartData }) => {
                   {timeElem.hasJob && (
                     <div className="item-job">
                       {timeElem.startEvent && (
-                        <span className="item-job-res">{timeElem.resources}</span>
+                        <span className="item-job-res">
+                          {timeElem.resources}
+                        </span>
                       )}
                     </div>
                   )}
@@ -147,26 +171,29 @@ export const GanttChart = ({ chartData }: { chartData: IChartData }) => {
             </div>
           </React.Fragment>
         ))}
-        <div className="gant-row-job">time line</div>
+        <div className="gant-row-job time-cell">time line</div>
         <div className="gant-row-period">
           {timeAxis.map((time) => (
-            <div key={time} className="gant-row-item">
-              {time}
+            <div key={time} className="gant-row-item item-time-axis">
+              <span className="time-axis-value">{time}</span>
             </div>
           ))}
         </div>
         {resourcesAxis.map((cell) => (
           <React.Fragment key={cell}>
-            <div className="gant-row-job">{cell}</div>
+            <div className="gant-row-job time-cell">{cell}</div>
             <div className="gant-row-period">
               {timeAxis.map((timeCell) => {
                 const isResourceLevel =
-                  resourcesSum[timeCell] === cell && resourcesSum[timeCell] !== 0;
+                  resourcesSum[timeCell] === cell &&
+                  resourcesSum[timeCell] !== 0;
 
                 return (
                   <div
                     key={timeCell}
-                    className={`gant-row-item ${isResourceLevel && "res-level"}`}
+                    className={`gant-row-item ${
+                      isResourceLevel && "res-level"
+                    }`}
                   >
                     {isResourceLevel && resourcesSum[timeCell]}
                   </div>

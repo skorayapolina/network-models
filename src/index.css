@@ -1,13 +1,36 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&display=swap');
+
 *,
 *:before,
 *:after {
   box-sizing: border-box;
 }
 
-body {
-  font-family: 'Open Sans', sans-serif;
+html, body, h1, button, tr, th, td {
+  margin: 0;
+  padding: 0;
 }
 
 html {
-  font-size: 100%;
+  scrollbar-gutter: stable;
+}
+
+body {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--fs-data);
+}
+
+button, input {
+  font: inherit;
+  color: inherit;
+  border: none;
+  outline: none;
+}
+
+input {
+  font: inherit;
+  font-weight: normal;
+}
+input:focus {
+  outline: none;
 }

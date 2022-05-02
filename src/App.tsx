@@ -15,14 +15,15 @@ import "./App.css";
 
 const options = {
   physics: {
-    enabled: false
+    enabled: false,
   },
   nodes: {
-    color: "rgb(136,169,229)",
+    color: "#DFDEFC",
   },
   edges: {
+    width: 2,
     color: {
-      inherit: false,
+      inherit: true,
     },
     smooth: {
       type: "vertical",
@@ -30,7 +31,7 @@ const options = {
       roundness: 0.25,
     },
   },
-  height: "280px",
+  height: "520px",
 };
 
 export const computeModel = (
@@ -59,6 +60,7 @@ const createGraphView = (
   resources
 ) => {
   const graphLinks = graph.serialize().links;
+  let ficIndex = 0;
   return {
     nodes: graph.nodes().map((node) => ({
       id: node,
@@ -66,6 +68,7 @@ const createGraphView = (
       title: `erlPoss: ${erlPoss[node]}; ltsPoss: ${ltsPoss[node]}`,
     })),
     edges: graphLinks.map((link) => {
+      const jobNumber = link.weight ? link.weight : `0${ficIndex++}`;
       const indexOfLinkSourceInCriticalPath = criticalPath.findIndex(
         (value) => value === link.source
       );
@@ -78,9 +81,9 @@ const createGraphView = (
         to: link.target,
         label: `${eventDuration} (${link.weight})`,
         ...(link.weight ? {} : { dashes: true }),
-        ...(isOnCriticalPass ? { color: "rgb(197,13,255)" } : {}),
+        ...(isOnCriticalPass ? { color: "#d32000" } : {}),
         payload: {
-          jobNumber: link.weight,
+          jobNumber,
           resources: resources[link.weight],
           isOnCriticalPass,
           start: erlPoss[link.source],
@@ -158,70 +161,86 @@ function App() {
   }, [worksCount]);
 
   return (
-    <div className="App">
-      <header className="App-header">Сетевые модели</header>
+    <div className="app">
+      <h1 className="app-title">Сетевые модели</h1>
 
-      <main>
-        <div>
-          <span>Количество работ:</span>
+      <main className="main">
+        <div className="input-wrapper-jobs">
+          <label>Количество работ:</label>
           <input
             type="number"
             value={worksCount}
             onChange={onWorksCountChange}
+            className="input"
           />
         </div>
 
-        <div className="wrapper">
-          <table>
-            <thead>
-            <tr>
-              <th>Номер работы</th>
-              <th>Сроки выполнения</th>
-              <th>
-                Каким работам предшествует <br /> (через запятую)
-              </th>
-              <th>Ресурсы</th>
-            </tr>
-            </thead>
-            <tbody>
-            {nodesArray.map((node) => (
-              <tr key={node}>
-                <td>{node}</td>
-                <td>
-                  <input
-                    type="text"
-                    name={`${node}`}
-                    value={durations[node] || ""}
-                    onChange={onDurationChange}
-                    autoComplete="off"
-                  />
-                </td>
-                <td>
-                  <input
-                    type="text"
-                    name={`${node}`}
-                    value={predNodesInput[node]}
-                    onChange={onPredNodesChange}
-                    autoComplete="off"
-                  />
-                </td>
-                <td>
-                  <input
-                    type="text"
-                    name={`${node}`}
-                    value={resources[node] || ""}
-                    onChange={onResourcesChange}
-                    autoComplete="off"
-                  />
-                </td>
+        <div className="table-wrapper">
+          <table className="table">
+            <thead className="thead">
+              <tr className="thead-row">
+                <th className="thead-data">Номер работы</th>
+                <th className="thead-data">Сроки выполнения</th>
+                <th className="thead-data">
+                  Каким работам предшествует <br /> (через запятую)
+                </th>
+                <th className="thead-data">Ресурсы</th>
               </tr>
-            ))}
+            </thead>
+            <tbody className="tbody">
+              {nodesArray.map((node) => (
+                <tr key={node} className="tbody-row">
+                  <td className="tbody-data data-number">{node}</td>
+                  <td className="tbody-data">
+                    <input
+                      type="text"
+                      name={`${node}`}
+                      value={durations[node] || ""}
+                      onChange={onDurationChange}
+                      autoComplete="off"
+                      tabIndex={1}
+                      className="input input-table"
+                    />
+                  </td>
+                  <td className="tbody-data">
+                    <input
+                      type="text"
+                      name={`${node}`}
+                      value={predNodesInput[node]}
+                      onChange={onPredNodesChange}
+                      autoComplete="off"
+                      tabIndex={2}
+                      className="input input-table"
+                    />
+                  </td>
+                  <td className="tbody-data">
+                    <input
+                      type="text"
+                      name={`${node}`}
+                      value={resources[node] || ""}
+                      onChange={onResourcesChange}
+                      autoComplete="off"
+                      tabIndex={3}
+                      className="input input-table"
+                    />
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
-          {graphView && <Graph graph={graphView} options={options} />}
         </div>
 
-        <button onClick={onCreateModelClick}>Построить модель</button>
+        <div className="button-wrapper">
+          <button className="button" onClick={onCreateModelClick}>
+            Построить модель
+          </button>
+        </div>
+
+        {graphView && (
+          <div className="graph-wrapper">
+            <Graph graph={graphView} options={options} />
+          </div>
+        )}
         {graphView && (
           <GanttChart
             chartData={graphView.edges
