@@ -99,7 +99,7 @@ const createGraphView = (
 };
 
 function App() {
-  const [worksCount, setWorksCount] = useState(10);
+  const [worksCount, setWorksCount] = useState(4);
   const [nodesArray, setNodesArray] = useState<number[]>([]);
   const [durations, setDurations] = useState<{ [key: string]: number }>({});
   const [resources, setResources] = useState<{ [key: string]: number }>({});
@@ -136,9 +136,9 @@ function App() {
   const onCreateModelClick = () => {
     setGraphView(
       createGraphView(
-        ...computeModel(testPredNodes, testDurations),
-        testDurations,
-        testResources
+        ...computeModel(predNodes, durations),
+        durations,
+        resources
       )
     );
   };
@@ -258,43 +258,43 @@ function App() {
   );
 }
 
-const testResources = {
-  1: 7,
-  2: 7,
-  3: 1,
-  4: 5,
-  5: 9,
-  6: 2,
-  7: 3,
-  8: 8,
-  9: 1,
-  10: 8,
-};
-
-const testDurations = {
-  1: 2,
-  2: 5,
-  3: 3,
-  4: 2,
-  5: 1,
-  6: 4,
-  7: 4,
-  8: 2,
-  9: 2,
-  10: 5,
-};
-
-const testPredNodes = {
-  1: [5, 8],
-  2: [9, 10],
-  3: [],
-  4: [2, 5, 8],
-  5: [3],
-  6: [1, 7],
-  7: [2, 5, 8],
-  8: [9, 10],
-  9: [],
-  10: [3],
-};
+// const testResources = {
+//   1: 7,
+//   2: 7,
+//   3: 1,
+//   4: 5,
+//   5: 9,
+//   6: 2,
+//   7: 3,
+//   8: 8,
+//   9: 1,
+//   10: 8,
+// };
+//
+// const testDurations = {
+//   1: 2,
+//   2: 5,
+//   3: 3,
+//   4: 2,
+//   5: 1,
+//   6: 4,
+//   7: 4,
+//   8: 2,
+//   9: 2,
+//   10: 5,
+// };
+//
+// const testPredNodes = {
+//   1: [5, 8],
+//   2: [9, 10],
+//   3: [],
+//   4: [2, 5, 8],
+//   5: [3],
+//   6: [1, 7],
+//   7: [2, 5, 8],
+//   8: [9, 10],
+//   9: [],
+//   10: [3],
+// };
 
 export default App;
