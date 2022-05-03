@@ -5,12 +5,15 @@
 
   --base-transition: 0.3s ease;
 
-  --color-font: #404D61;
+  --color-font: var(--color-gray-700);
   --color-table-row-focus: var(--color-indigo-50);
   --color-table-row-hover: var(--color-indigo-0);
   --color-layout-bg: #F7F9FC;
   --color-job: #00A9A9;
   --color-job-offset: rgba(0, 125, 125, 0.2);
+
+  --color-gray-900: #171C26;
+  --color-gray-700: #464F60;
 
   --color-indigo-600: #4945C4;
   --color-indigo-500: #5E5ADB;
@@ -23,8 +26,14 @@
   --color-orange-0: #ffe2c1;
 
   --shadow-table: 0px 4px 50px rgba(0, 0, 0, 0.1);
-  --shadow-pr-btn: 0px 1px 1px rgba(0, 0, 0, 0.1), 0px 0px 0px 1px #5E5ADB;
-  --shadow-pr-btn-focus: 0px 1px 1px rgba(0, 0, 0, 0.1), 0px 0px 0px 1px #5E5ADB, 0px 0px 0px 4px rgba(94, 90, 219, 0.4);
+
+  --shadow-btn: 0px 1px 1px rgba(0, 0, 0, 0.1), 0px 0px 0px 1px var(--color-indigo-500);
+  --shadow-btn-hover: 0px 1px 1px rgba(0, 0, 0, 0.1), 0px 0px 0px 1px var(--color-indigo-600);
+  --shadow-btn-focus: 0px 1px 1px rgba(0, 0, 0, 0.1), 0px 0px 0px 1px  var(--color-indigo-500), 0px 0px 0px 4px rgba(94, 90, 219, 0.4);
+
+  --shadow-btn-secondary: 0px 1px 1px rgba(0, 0, 0, 0.1), 0px 0px 0px 1px rgba(70, 79, 96, 0.16);
+  --shadow-btn-secondary-hover: 0px 1px 1px rgba(0, 0, 0, 0.1), 0px 0px 0px 1px rgba(70, 79, 96, 0.32);
+  --shadow-btn-secondary-focus: 0px 1px 1px rgba(0, 0, 0, 0.1), 0px 0px 0px 1px rgba(70, 79, 96, 0.32), 0px 0px 0px 4px rgba(94, 90, 219, 0.4);
 
   --shadow-input: 0px 1px 2px rgba(0, 0, 0, 0.06), 0px 0px 0px 1px rgba(134, 143, 160, 0.16);
   --shadow-input-hover: 0px 1px 2px rgba(0, 0, 0, 0.06), 0px 0px 0px 1px rgba(134, 143, 160, 0.4);

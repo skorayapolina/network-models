@@ -104,3 +104,6 @@
 .gant-row-item.res-level {
   background-color: var(--color-orange-300);
 }
+.gant-row-item.res-level-info {
+  background-color: #bed6f3;
+}

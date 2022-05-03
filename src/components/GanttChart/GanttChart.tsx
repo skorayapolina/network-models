@@ -6,7 +6,7 @@ export type IChartData = IEdgePayload[];
 interface IEdgePayload {
   jobNumber: number;
   resources: number;
-  isOnCriticalPass: boolean;
+  isOnCriticalPath: boolean;
   start: number;
   factStart: number;
   end: number;
@@ -92,6 +92,10 @@ export const GanttChart = ({ chartData }: { chartData: IChartData }) => {
     );
   }, [resourcesSum]);
 
+  useEffect(() => {
+    setChartDataState(chartData);
+  }, [chartData]);
+
   const moveJob =
     (jobNumber: number, step = 1) =>
     () => {
@@ -114,14 +118,14 @@ export const GanttChart = ({ chartData }: { chartData: IChartData }) => {
       <div className="add-time-wrapper">
         <span>Дополнительное время: </span>
         <button
-          className="button button-square"
+          className="button button-square button--primary"
           onClick={changeAdditionalTime(-1)}
         >
           -
         </button>
         <div className="add-time-value">{additionalTime}</div>
         <button
-          className="button button-square"
+          className="button button-square button--primary"
           onClick={changeAdditionalTime(1)}
         >
           +
@@ -133,13 +137,13 @@ export const GanttChart = ({ chartData }: { chartData: IChartData }) => {
             <div className="gant-row-job">
               <span className="job-label">Job {number}</span>
               <button
-                className="button button-square button-chart"
+                className="button button-square button--primary button-chart"
                 onClick={moveJob(number, -1)}
               >
                 -
               </button>
               <button
-                className="button button-square button-chart"
+                className="button button-square button--primary button-chart"
                 onClick={moveJob(number)}
               >
                 +
@@ -181,19 +185,21 @@ export const GanttChart = ({ chartData }: { chartData: IChartData }) => {
         </div>
         {resourcesAxis.map((cell) => (
           <React.Fragment key={cell}>
-            <div className="gant-row-job time-cell">{cell}</div>
+            <div className="gant-row-job time-cell">{cell || '∑'}</div>
             <div className="gant-row-period">
               {timeAxis.map((timeCell) => {
+                const isInfoLine = cell === 0;
                 const isResourceLevel =
                   resourcesSum[timeCell] === cell &&
-                  resourcesSum[timeCell] !== 0;
+                  resourcesSum[timeCell] !== 0 || isInfoLine;
 
                 return (
                   <div
                     key={timeCell}
-                    className={`gant-row-item ${
-                      isResourceLevel && "res-level"
-                    }`}
+                    className={`gant-row-item 
+                    ${isResourceLevel && "res-level"}
+                    ${isInfoLine && "res-level-info"}
+                    `}
                   >
                     {isResourceLevel && resourcesSum[timeCell]}
                   </div>
