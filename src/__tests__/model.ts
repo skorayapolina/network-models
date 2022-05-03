@@ -501,4 +501,33 @@ describe("Checks critical path and min time to complete project", () => {
     expect(criticalPath).toEqual(['P0', 'P2', 'P4', 'P6']);
     expect(Math.max(...Object.values(erlPoss))).toEqual(22);
   });
+
+  it("9.My-with-end-fic", () => {
+    const testPredNodes = {
+      1: [2,3,4],
+      2: [],
+      3: [],
+      4: [],
+    };
+
+    const testDurations = {
+      1: 1,
+      2: 5,
+      3: 1,
+      4: 4
+    };
+
+    const testResources = {
+      1: 8,
+      2: 5,
+      3: 9,
+      4: 7
+    };
+
+    const [graph, erlPoss, criticalPath, ltsPoss] = computeModel(testPredNodes, testDurations);
+
+    const graphSerialized = graph.serialize();
+
+    expect(graphSerialized.nodes.length).toEqual(5);
+  });
 });

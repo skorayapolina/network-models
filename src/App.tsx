@@ -108,6 +108,7 @@ function App() {
     [key: string]: string;
   }>({});
   const [graphView, setGraphView] = useState<any>(null);
+  const [changesIndex, setChangesIndex] = useState(0);
 
   const onWorksCountChange = (event: ChangeEvent<HTMLInputElement>) => {
     setWorksCount(Number(event.target.value));
@@ -134,6 +135,7 @@ function App() {
   };
 
   const onCreateModelClick = () => {
+    setChangesIndex(prevIndex => prevIndex + 1)
     setGraphView(
       createGraphView(
         ...computeModel(predNodes, durations),
@@ -158,7 +160,7 @@ function App() {
     setPredNodes(initPredNodes);
     setPredNodesInput(initPredNodesInput);
     setNodesArray(Array.from({ length: worksCount }, (_, i) => i + 1));
-  }, [worksCount]);
+  }, []);
 
   return (
     <div className="app">
@@ -243,6 +245,7 @@ function App() {
         )}
         {graphView && (
           <GanttChart
+            key={changesIndex}
             chartData={graphView.edges
               .map((edge) => edge.payload)
               .sort((a, b) => {

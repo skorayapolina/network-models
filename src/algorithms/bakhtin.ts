@@ -263,15 +263,22 @@ export function createNetworkModel(pred) {
       }
     });
 
+    const finishNode = "N" + newVIndex;
     endNodes.forEach((endNode) => {
       const incoming = getIncomingEdges(graph, endNode);
 
       incoming.forEach((incomingEdge) => {
-        graph.addEdge(
-          incomingEdge.source,
-          "N" + newVIndex,
-          incomingEdge.weight
-        );
+        if (!isEdgeExist(graph, incomingEdge.source, finishNode)) {
+          graph.addEdge(
+            incomingEdge.source,
+            finishNode,
+            incomingEdge.weight
+          );
+        } else {
+          newVIndex++;
+          graph.addEdge(incomingEdge.source, "N" + newVIndex, incomingEdge.weight);
+          graph.addEdge("N" + newVIndex, finishNode, 0);
+        }
       });
 
       graph.removeNode(endNode);
