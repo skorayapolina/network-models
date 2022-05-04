@@ -1,4 +1,3 @@
-import Graph from "graph-data-structure";
 import {
   getIncomingEdges,
   getVerticesWithOnlyFictitiousIncomingEdges,
@@ -291,7 +290,7 @@ const joinEndEvents = (graph, newVIndex) => {
 const INITIAL_NEW_VERTEX_INDEX = 0;
 const INITIAL_FICTION_INDEX = 0;
 
-interface IPipeParams {
+export interface IPipeParams {
   pred: object;
   graph: any;
   newVIndex: number;

@@ -105,7 +105,6 @@ function App() {
       );
     }, 2000);
 
-
     setTimeout(() => {
       params = pipe3(params);
       setGraphView(
@@ -116,7 +115,6 @@ function App() {
         )
       );
     }, 4000);
-
 
     setTimeout(() => {
       params = pipe4(params);
@@ -129,19 +127,17 @@ function App() {
       );
     }, 6000);
 
-
     setTimeout(() => {
       params = pipe5(params);
       setGraphView(
-        createGraphViewNotFinal(
-          params.graph,
+        createGraphView(
+          ...computeModel(params, durations),
           durations,
           resources
         )
       );
+      setChangesIndex((prevIndex) => prevIndex + 1);
     }, 8000);
-
-    setChangesIndex((prevIndex) => prevIndex + 1);
   };
 
   useEffect(() => {
