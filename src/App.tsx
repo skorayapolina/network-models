@@ -1,9 +1,11 @@
 import React, { ChangeEvent, useEffect, useState } from "react";
-import Graph from "react-graph-vis";
-import { computeModel, createGraphView } from 'helpers/helpers';
+import {default as GraphComponent } from "react-graph-vis";
+import { computeModel, createGraphView, createGraphViewNotFinal } from 'helpers/helpers';
 import { graphOptions } from 'helpers/options';
 import { GanttChart } from "components/GanttChart/GanttChart";
 import "./App.css";
+import { pipe1, pipe2, pipe3, pipe4, pipe5 } from 'algorithms/bakhtin';
+import Graph from 'graph-data-structure';
 
 const INITIAL_JOBS_COUNT = 4;
 
@@ -82,14 +84,64 @@ function App() {
   };
 
   const onCreateModelClick = () => {
-    setChangesIndex((prevIndex) => prevIndex + 1);
+    const tmpGraph = Graph();
+    let params = pipe1({graph: tmpGraph, pred: predNodes, newVIndex: 0, newFicIndex: 0 });
     setGraphView(
-      createGraphView(
-        ...computeModel(predNodes, durations),
+      createGraphViewNotFinal(
+        params.graph,
         durations,
         resources
       )
     );
+
+    setTimeout(() => {
+      params = pipe2(params);
+      setGraphView(
+        createGraphViewNotFinal(
+          params.graph,
+          durations,
+          resources
+        )
+      );
+    }, 2000);
+
+
+    setTimeout(() => {
+      params = pipe3(params);
+      setGraphView(
+        createGraphViewNotFinal(
+          params.graph,
+          durations,
+          resources
+        )
+      );
+    }, 4000);
+
+
+    setTimeout(() => {
+      params = pipe4(params);
+      setGraphView(
+        createGraphViewNotFinal(
+          params.graph,
+          durations,
+          resources
+        )
+      );
+    }, 6000);
+
+
+    setTimeout(() => {
+      params = pipe5(params);
+      setGraphView(
+        createGraphViewNotFinal(
+          params.graph,
+          durations,
+          resources
+        )
+      );
+    }, 8000);
+
+    setChangesIndex((prevIndex) => prevIndex + 1);
   };
 
   useEffect(() => {
@@ -187,7 +239,7 @@ function App() {
 
         {graphView && (
           <div className="graph-wrapper">
-            <Graph graph={graphView} options={graphOptions} />
+            <GraphComponent graph={graphView} options={graphOptions} />
           </div>
         )}
         {graphView && (
