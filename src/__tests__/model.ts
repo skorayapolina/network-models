@@ -1,4 +1,4 @@
-import { computeModel } from "App";
+import { computeModel } from 'helpers/helpers';
 
 describe("Checks critical path and min time to complete project", () => {
   it("0.m", () => {
