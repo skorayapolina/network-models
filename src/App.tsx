@@ -1,10 +1,9 @@
-import React, { ChangeEvent, useEffect, useRef, useState } from "react";
+import React, { ChangeEvent, RefObject, useEffect, useRef, useState } from "react";
 import Graph from "graph-data-structure";
-import { default as GraphComponent } from "react-graph-vis";
 import {
   computeModelParams,
   createGraphView,
-  createGraphViewNotFinal,
+  createGraphViewNotFinal, getChartData,
 } from "helpers/helpers";
 import { graphOptions } from "helpers/options";
 import { GanttChart } from "components/GanttChart/GanttChart";
@@ -18,6 +17,9 @@ import {
   pipe6,
   pipe7,
 } from "helpers/modelPipes";
+import { VisGraph } from 'components/VisGraph/VisGraph';
+import { Durations, PredNodes, PredNodesInput, Resources } from 'helpers/types';
+import { Table } from 'components/Table/Table';
 
 const INITIAL_JOBS_COUNT = 4;
 
@@ -34,16 +36,12 @@ const wait = (button: HTMLElement | null) => {
 
 function App() {
   const networkRef = useRef<any>(null);
-  const buttonRef = useRef<HTMLButtonElement | null>(null);
   const [jobsCount, setJobsCount] = useState(INITIAL_JOBS_COUNT);
-  const [nodesArray, setNodesArray] = useState<number[]>([]);
-  const [durations, setDurations] = useState<{ [key: string]: number }>({});
-  const [resources, setResources] = useState<{ [key: string]: number }>({});
-  const [predNodes, setPredNodes] = useState<{ [key: string]: number[] }>({});
-  const [predNodesInput, setPredNodesInput] = useState<{
-    [key: string]: string;
-  }>({});
-  const [graphView, setGraphView] = useState<any>(null);
+  const [durations, setDurations] = useState<Durations>({});
+  const [resources, setResources] = useState<Resources>({});
+  const [predNodes, setPredNodes] = useState<PredNodes>({});
+  const [predNodesInput, setPredNodesInput] = useState<PredNodesInput>({});
+  const [visGraphData, setVisGraphData] = useState<any>(null);
   const [changesIndex, setChangesIndex] = useState(0);
 
   const initState = () => {
@@ -85,6 +83,7 @@ function App() {
   };
 
   const onWorksCountChange = (event: ChangeEvent<HTMLInputElement>) => {
+    updateWorksCount();
     setJobsCount(Number(event.target.value));
   };
 
@@ -108,53 +107,52 @@ function App() {
     setPredNodesInput({ ...predNodesInput, [target.name]: target.value });
   };
 
-  const onCreateModelClick = async () => {
-    const tmpGraph = Graph();
+  const onCreateModelClick = (buttonRef: RefObject<HTMLButtonElement>) => async () => {
     let params = pipe1({
-      graph: tmpGraph,
+      graph: Graph(),
       pred: predNodes,
       newVIndex: 0,
       newFicIndex: 0,
     });
-    setGraphView(createGraphViewNotFinal(params.graph, durations, resources));
+    setVisGraphData(createGraphViewNotFinal(params.graph, durations, resources));
     console.log("pipe1");
 
     buttonRef.current!.style.visibility = "visible";
     await wait(buttonRef.current);
 
     params = pipe2(params);
-    setGraphView(createGraphViewNotFinal(params.graph, durations, resources));
+    setVisGraphData(createGraphViewNotFinal(params.graph, durations, resources));
     console.log("pipe2");
 
     await wait(buttonRef.current);
 
     params = pipe3(params);
-    setGraphView(createGraphViewNotFinal(params.graph, durations, resources));
+    setVisGraphData(createGraphViewNotFinal(params.graph, durations, resources));
     console.log("pipe3");
 
     await wait(buttonRef.current);
 
     params = pipe4(params);
-    setGraphView(createGraphViewNotFinal(params.graph, durations, resources));
+    setVisGraphData(createGraphViewNotFinal(params.graph, durations, resources));
     console.log("pipe4");
 
     await wait(buttonRef.current);
 
     params = pipe5(params);
-    setGraphView(createGraphViewNotFinal(params.graph, durations, resources));
+    setVisGraphData(createGraphViewNotFinal(params.graph, durations, resources));
     console.log("pipe5");
 
     await wait(buttonRef.current);
 
     params = pipe6(params);
-    setGraphView(createGraphViewNotFinal(params.graph, durations, resources));
+    setVisGraphData(createGraphViewNotFinal(params.graph, durations, resources));
     console.log("pipe6");
 
     await wait(buttonRef.current);
     buttonRef.current!.style.visibility = "hidden";
 
     params = pipe7(params);
-    setGraphView(
+    setVisGraphData(
       createGraphView(
         ...computeModelParams(params.graph, durations),
         durations,
@@ -162,7 +160,7 @@ function App() {
       )
     );
     setChangesIndex((prevIndex) => prevIndex + 1);
-    // delay for apply after render
+    // delay in order to apply after render
     setTimeout(() => {
       networkRef.current?.setOptions({
         ...graphOptions,
@@ -175,18 +173,27 @@ function App() {
   };
 
   useEffect(() => {
-    updateWorksCount();
-    setNodesArray(Array.from({ length: jobsCount }, (_, i) => i + 1));
-  }, [jobsCount]);
-
-  useEffect(() => {
     initState();
   }, []);
+
+  const tableData = {
+    durations: {
+      data: durations,
+      action: onDurationChange
+    },
+    predNodesInput: {
+      data: predNodesInput,
+      action: onPredNodesChange
+    },
+    resources: {
+      data: resources,
+      action: onResourcesChange
+    }
+  }
 
   return (
     <div className="app">
       <h1 className="app-title">Сетевые модели</h1>
-
       <main className="main">
         <div className="table-controls">
           <div className="input-wrapper-jobs">
@@ -202,98 +209,19 @@ function App() {
             Очистить
           </button>
         </div>
-
-        <div className="table-wrapper">
-          <table className="table">
-            <thead className="thead">
-              <tr className="thead-row">
-                <th className="thead-data">Номер работы</th>
-                <th className="thead-data">Сроки выполнения</th>
-                <th className="thead-data">
-                  Каким работам предшествует <br /> (через запятую)
-                </th>
-                <th className="thead-data">Ресурсы</th>
-              </tr>
-            </thead>
-            <tbody className="tbody">
-              {nodesArray.map((node) => (
-                <tr key={node} className="tbody-row">
-                  <td className="tbody-data data-number">{node}</td>
-                  <td className="tbody-data">
-                    <input
-                      type="text"
-                      name={`${node}`}
-                      value={durations[node] || ""}
-                      onChange={onDurationChange}
-                      autoComplete="off"
-                      tabIndex={1}
-                      className="input input-table"
-                    />
-                  </td>
-                  <td className="tbody-data">
-                    <input
-                      type="text"
-                      name={`${node}`}
-                      value={predNodesInput[node]}
-                      onChange={onPredNodesChange}
-                      autoComplete="off"
-                      tabIndex={2}
-                      className="input input-table"
-                    />
-                  </td>
-                  <td className="tbody-data">
-                    <input
-                      type="text"
-                      name={`${node}`}
-                      value={resources[node] || ""}
-                      onChange={onResourcesChange}
-                      autoComplete="off"
-                      tabIndex={3}
-                      className="input input-table"
-                    />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        <div className="button-wrapper">
-          <button
-            className="button button--primary"
-            onClick={onCreateModelClick}
-          >
-            Построить модель
-          </button>
-        </div>
-
-        <div className="graph-wrapper">
-          <button
-            ref={buttonRef}
-            className="button button--primary button-square button-nextStep"
-          >
-            {"->"}
-          </button>
-          {graphView && (
-            <GraphComponent
-              graph={graphView}
-              options={graphOptions}
-              getNetwork={(network) => (networkRef.current = network)}
-            />
-          )}
-        </div>
-
-        {graphView && (
+        <Table
+          jobsCount={jobsCount}
+          data={tableData}
+        />
+        <VisGraph
+          onCreateModelClick={onCreateModelClick}
+          getNetwork={(network) => (networkRef.current = network)}
+          graphView={visGraphData}
+        />
+        {visGraphData && (
           <GanttChart
             key={changesIndex}
-            chartData={graphView.edges
-              .map((edge) => edge.payload)
-              .sort((a, b) => {
-                return Number(b.from.slice(1)) - Number(a.from.slice(1));
-              })
-              .sort((a, b) => {
-                return a.isOnCriticalPath - b.isOnCriticalPath;
-              })}
+            chartData={getChartData(visGraphData)}
           />
         )}
       </main>

@@ -86,30 +86,3 @@ body {
 .data-number {
   text-align: center;
 }
-
-/* button */
-.button-wrapper {
-  text-align: right;
-  margin-bottom: 3rem;
-}
-
-.graph-wrapper {
-  position: relative;
-  margin-bottom: 3rem;
-  border-radius: 8px;
-  background-color: #fff;
-  box-shadow: var(--shadow-table);
-}
-
-.graph-wrapper .vis-network:focus {
-  outline: none;
-  border-radius: 8px;
-  box-shadow: var(--shadow-input-focus);
-}
-
-.button-nextStep {
-  position: absolute;
-  visibility: hidden;
-  top: 4px;
-  right: -36px;
-}

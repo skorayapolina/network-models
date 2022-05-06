@@ -98,3 +98,15 @@ export const createGraphView = (
     }),
   };
 };
+
+export function getChartData(graphView) {
+  return graphView.edges
+    .map((edge) => edge.payload)
+    .sort((a, b) => {
+      return Number(b.from.slice(1)) - Number(a.from.slice(1));
+    })
+    .sort((a, b) => {
+      return a.isOnCriticalPath - b.isOnCriticalPath;
+    });
+}
+

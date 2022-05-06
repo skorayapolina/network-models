@@ -3,8 +3,7 @@ export const graphOptions = {
     hierarchical: {
       sortMethod: "directed",
       enabled: true,
-      direction: "LR",
-      blockShifting: false
+      direction: "LR"
     },
   },
   physics: {
