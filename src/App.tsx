@@ -1,9 +1,16 @@
-import React, { ChangeEvent, RefObject, useEffect, useRef, useState } from "react";
+import React, {
+  ChangeEvent,
+  RefObject,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import Graph from "graph-data-structure";
 import {
   computeModelParams,
   createGraphView,
-  createGraphViewNotFinal, getChartData,
+  createGraphViewNotFinal,
+  getChartData,
 } from "helpers/helpers";
 import { graphOptions } from "helpers/options";
 import { GanttChart } from "components/GanttChart/GanttChart";
@@ -17,9 +24,9 @@ import {
   pipe6,
   pipe7,
 } from "helpers/modelPipes";
-import { VisGraph } from 'components/VisGraph/VisGraph';
-import { Durations, PredNodes, PredNodesInput, Resources } from 'helpers/types';
-import { Table } from 'components/Table/Table';
+import { VisGraph } from "components/VisGraph/VisGraph";
+import { Durations, PredNodes, PredNodesInput, Resources } from "helpers/types";
+import { Table } from "components/Table/Table";
 
 const INITIAL_JOBS_COUNT = 4;
 
@@ -107,70 +114,87 @@ function App() {
     setPredNodesInput({ ...predNodesInput, [target.name]: target.value });
   };
 
-  const onCreateModelClick = (buttonRef: RefObject<HTMLButtonElement>) => async () => {
-    let params = pipe1({
-      graph: Graph(),
-      pred: predNodes,
-      newVIndex: 0,
-      newFicIndex: 0,
-    });
-    setVisGraphData(createGraphViewNotFinal(params.graph, durations, resources));
-    console.log("pipe1");
+  const onCreateModelClick =
+    (buttonRef: RefObject<HTMLButtonElement>) => async () => {
+      if (networkRef.current) {
+        networkRef.current?.setOptions(graphOptions);
+      }
 
-    buttonRef.current!.style.visibility = "visible";
-    await wait(buttonRef.current);
-
-    params = pipe2(params);
-    setVisGraphData(createGraphViewNotFinal(params.graph, durations, resources));
-    console.log("pipe2");
-
-    await wait(buttonRef.current);
-
-    params = pipe3(params);
-    setVisGraphData(createGraphViewNotFinal(params.graph, durations, resources));
-    console.log("pipe3");
-
-    await wait(buttonRef.current);
-
-    params = pipe4(params);
-    setVisGraphData(createGraphViewNotFinal(params.graph, durations, resources));
-    console.log("pipe4");
-
-    await wait(buttonRef.current);
-
-    params = pipe5(params);
-    setVisGraphData(createGraphViewNotFinal(params.graph, durations, resources));
-    console.log("pipe5");
-
-    await wait(buttonRef.current);
-
-    params = pipe6(params);
-    setVisGraphData(createGraphViewNotFinal(params.graph, durations, resources));
-    console.log("pipe6");
-
-    await wait(buttonRef.current);
-    buttonRef.current!.style.visibility = "hidden";
-
-    params = pipe7(params);
-    setVisGraphData(
-      createGraphView(
-        ...computeModelParams(params.graph, durations),
-        durations,
-        resources
-      )
-    );
-    setChangesIndex((prevIndex) => prevIndex + 1);
-    // delay in order to apply after render
-    setTimeout(() => {
-      networkRef.current?.setOptions({
-        ...graphOptions,
-        layout: {
-          hierarchical: false,
-        },
+      let params = pipe1({
+        graph: Graph(),
+        pred: predNodes,
+        newVIndex: 0,
+        newFicIndex: 0,
       });
-    }, 10);
-    console.log("pipe7 - final");
-  };
+      setVisGraphData(
+        createGraphViewNotFinal(params.graph, durations, resources)
+      );
+      console.log("pipe1");
+
+      buttonRef.current!.style.visibility = "visible";
+      await wait(buttonRef.current);
+
+      params = pipe2(params);
+      setVisGraphData(
+        createGraphViewNotFinal(params.graph, durations, resources)
+      );
+      console.log("pipe2");
+
+      await wait(buttonRef.current);
+
+      params = pipe3(params);
+      setVisGraphData(
+        createGraphViewNotFinal(params.graph, durations, resources)
+      );
+      console.log("pipe3");
+
+      await wait(buttonRef.current);
+
+      params = pipe4(params);
+      setVisGraphData(
+        createGraphViewNotFinal(params.graph, durations, resources)
+      );
+      console.log("pipe4");
+
+      await wait(buttonRef.current);
+
+      params = pipe5(params);
+      setVisGraphData(
+        createGraphViewNotFinal(params.graph, durations, resources)
+      );
+      console.log("pipe5");
+
+      await wait(buttonRef.current);
+
+      params = pipe6(params);
+      setVisGraphData(
+        createGraphViewNotFinal(params.graph, durations, resources)
+      );
+      console.log("pipe6");
+
+      await wait(buttonRef.current);
+      buttonRef.current!.style.visibility = "hidden";
+
+      params = pipe7(params);
+      setVisGraphData(
+        createGraphView(
+          ...computeModelParams(params.graph, durations),
+          durations,
+          resources
+        )
+      );
+      setChangesIndex((prevIndex) => prevIndex + 1);
+      // delay in order to apply after render
+      setTimeout(() => {
+        networkRef.current?.setOptions({
+          ...graphOptions,
+          layout: {
+            hierarchical: false,
+          },
+        });
+      }, 10);
+      console.log("pipe7 - final");
+    };
 
   useEffect(() => {
     initState();
@@ -179,17 +203,17 @@ function App() {
   const tableData = {
     durations: {
       data: durations,
-      action: onDurationChange
+      action: onDurationChange,
     },
     predNodesInput: {
       data: predNodesInput,
-      action: onPredNodesChange
+      action: onPredNodesChange,
     },
     resources: {
       data: resources,
-      action: onResourcesChange
-    }
-  }
+      action: onResourcesChange,
+    },
+  };
 
   return (
     <div className="app">
@@ -209,10 +233,7 @@ function App() {
             Очистить
           </button>
         </div>
-        <Table
-          jobsCount={jobsCount}
-          data={tableData}
-        />
+        <Table jobsCount={jobsCount} data={tableData} />
         <VisGraph
           onCreateModelClick={onCreateModelClick}
           getNetwork={(network) => (networkRef.current = network)}
