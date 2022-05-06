@@ -32,11 +32,12 @@ export const GanttChart = ({ chartData }: { chartData: IChartData }) => {
   const [resourcesSum, setResourcesSum] = useState<number[]>([]);
   const [resourcesAxis, setResourcesAxis] = useState<number[]>([]);
   const [additionalTime, setAdditionalTime] = useState<number>(0);
+  // React Hook useMemo has a missing dependency: 'chartData'.
   const timeAxis = useMemo<number[]>(() => {
     const time =
       Math.max(...chartData.map((job) => job.end)) + additionalTime + 2;
     return Array.from({ length: time }, (_, i) => i);
-  }, [additionalTime]);
+  }, [chartData, additionalTime]);
 
   useEffect(() => {
     // init chart data
@@ -67,6 +68,7 @@ export const GanttChart = ({ chartData }: { chartData: IChartData }) => {
       );
     });
     setChartDataMap(newChartDataMap);
+    // React Hook useEffect has a missing dependency: 'timeAxis'.
   }, [chartDataState, additionalTime]);
 
   useEffect(() => {
@@ -185,13 +187,14 @@ export const GanttChart = ({ chartData }: { chartData: IChartData }) => {
         </div>
         {resourcesAxis.map((cell) => (
           <React.Fragment key={cell}>
-            <div className="gant-row-job time-cell">{cell || 'res ∑'}</div>
+            <div className="gant-row-job time-cell">{cell || "res ∑"}</div>
             <div className="gant-row-period">
               {timeAxis.map((timeCell) => {
                 const isInfoLine = cell === 0;
                 const isResourceLevel =
-                  resourcesSum[timeCell] === cell &&
-                  resourcesSum[timeCell] !== 0 || isInfoLine;
+                  (resourcesSum[timeCell] === cell &&
+                    resourcesSum[timeCell] !== 0) ||
+                  isInfoLine;
 
                 return (
                   <div

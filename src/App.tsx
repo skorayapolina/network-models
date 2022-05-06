@@ -51,6 +51,7 @@ function App() {
   const [visGraphData, setVisGraphData] = useState<any>(null);
   const [changesIndex, setChangesIndex] = useState(0);
 
+  // usecallback?
   const initState = () => {
     const initDurations = {};
     const initPredNodes = {};
@@ -90,7 +91,6 @@ function App() {
   };
 
   const onWorksCountChange = (event: ChangeEvent<HTMLInputElement>) => {
-    updateWorksCount();
     setJobsCount(Number(event.target.value));
   };
 
@@ -197,6 +197,11 @@ function App() {
     };
 
   useEffect(() => {
+    updateWorksCount();
+  }, [jobsCount]);
+
+  // React Hook useEffect has a missing dependency: 'initState'.
+  useEffect(() => {
     initState();
   }, []);
 
@@ -233,7 +238,7 @@ function App() {
             Очистить
           </button>
         </div>
-        <Table jobsCount={jobsCount} data={tableData} />
+        <Table jobsCount={jobsCount} data={tableData}/>
         <VisGraph
           onCreateModelClick={onCreateModelClick}
           getNetwork={(network) => (networkRef.current = network)}
