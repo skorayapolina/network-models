@@ -1,4 +1,3 @@
-import { createNetworkModel } from 'algorithms/bakhtin';
 import { getMapToRename, rankingEvents } from 'algorithms/ranking';
 import { getGraphCopy } from 'algorithms/helpers';
 import { renameNodes } from 'algorithms/renameNodes';
@@ -6,14 +5,13 @@ import { getEarliestPossible, getEventDuration } from 'algorithms/earliestPossib
 import { findCriticalPath } from 'algorithms/findCriticalPath';
 import { getLatestPossible } from 'algorithms/latestPossible';
 
-export const computeModel = (
-  predNodes,
+export const computeModelParams = (
+  model,
   durations
 ): [graph: any, erlPoss: object, criticalPath: string[], ltsPoss: object] => {
-  const oldGraph = createNetworkModel(predNodes);
-  const mapToRename = getMapToRename(rankingEvents(getGraphCopy(oldGraph)));
+  const mapToRename = getMapToRename(rankingEvents(getGraphCopy(model)));
 
-  const graph = renameNodes(oldGraph, mapToRename);
+  const graph = renameNodes(model, mapToRename);
   const ranking = rankingEvents(getGraphCopy(graph));
 
   const erlPoss = getEarliestPossible(graph, ranking, durations);
@@ -21,6 +19,38 @@ export const computeModel = (
   const ltsPoss = getLatestPossible(graph, ranking, erlPoss, durations);
 
   return [graph, erlPoss, criticalPath, ltsPoss];
+};
+
+export const createGraphViewNotFinal = (
+  graph: any,
+  durations,
+  resources
+) => {
+  const graphLinks = graph.serialize().links;
+  let ficIndex = 0;
+  return {
+    nodes: graph.nodes().map((node) => ({
+      id: node,
+      label: `${node}`,
+    })),
+    edges: graphLinks.map((link) => {
+      const jobNumber = link.weight ? link.weight : `0${ficIndex++}`;
+      const eventDuration = getEventDuration(link.weight, durations);
+      return {
+        from: link.source,
+        to: link.target,
+        label: `${eventDuration} (${link.weight})`,
+        ...(link.weight ? {} : { dashes: true }),
+        payload: {
+          jobNumber,
+          resources: resources[link.weight],
+          duration: eventDuration,
+          from: link.source,
+          to: link.target,
+        },
+      };
+    }),
+  };
 };
 
 export const createGraphView = (

@@ -185,7 +185,7 @@ export const GanttChart = ({ chartData }: { chartData: IChartData }) => {
         </div>
         {resourcesAxis.map((cell) => (
           <React.Fragment key={cell}>
-            <div className="gant-row-job time-cell">{cell || '∑'}</div>
+            <div className="gant-row-job time-cell">{cell || 'res ∑'}</div>
             <div className="gant-row-period">
               {timeAxis.map((timeCell) => {
                 const isInfoLine = cell === 0;

@@ -68,7 +68,4 @@ export function dijkstraMax(graph, durations) {
     processed.push(node);
     node = findLowestCostNode(costs);
   }
-  console.log('dijkstra result:');
-  console.log('costs', costs);
-  console.log('parents', parents);
 }

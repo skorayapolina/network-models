@@ -1,4 +1,12 @@
 export const graphOptions = {
+  layout: {
+    hierarchical: {
+      sortMethod: "directed",
+      enabled: true,
+      direction: "LR",
+      blockShifting: false
+    },
+  },
   physics: {
     enabled: false,
   },
@@ -14,7 +22,7 @@ export const graphOptions = {
     smooth: {
       type: "vertical",
       forceDirection: "none",
-      roundness: 0.25,
+      roundness: 0,
     },
   },
   height: "520px",
