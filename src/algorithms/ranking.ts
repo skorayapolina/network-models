@@ -12,7 +12,7 @@ export const rankingEvents = graph => {
       ranked.push(node);
     }
   });
-  console.log(graph.nodes());
+
   let index = 1;
   while (ranked.length < numberOfNodes) {
     ranking[index - 1].forEach(node => {

@@ -10,7 +10,7 @@ import {
 /*
  * 1. Добавляем в граф ребра работ
  * */
-const addWorks = (graph, pred) => {
+export const addWorks = (graph, pred) => {
   for (let i = 1; i <= Object.keys(pred).length; i++) {
     graph.addEdge("S" + i, "E" + i, i);
   }
@@ -20,11 +20,9 @@ const addWorks = (graph, pred) => {
  * 2. Для каждой вершины добавить ребро,
  * которое начинается в конце текущей вершины и заканчивается в начале следующей за ней
  * */
-const addFictitiousWorks = (graph, pred) => {
-  console.log("addFictitiousWorks")
+export const addFictitiousWorks = (graph, pred) => {
   Object.keys(pred).forEach((endVInx) => {
     pred[endVInx].forEach((startVInx) => {
-      console.log("addFictitiousWorks", "E" + endVInx, "S" + startVInx);
       graph.addEdge("E" + endVInx, "S" + startVInx, 0);
     });
   });
@@ -34,7 +32,7 @@ const addFictitiousWorks = (graph, pred) => {
  * 3. Если из пары событий выходят только фиктивные работы и их концы попарно совпадают,
  * то эти события склеваются
  * */
-const step3 = (graph, newVIndex) => {
+export const step3 = (graph, newVIndex) => {
   const equalFictitiousOutgoingNodes = groupBy(
     getVerticesWithOnlyFictitiousOutgoingEdges(graph),
     "adjacentNodes"
@@ -68,7 +66,7 @@ const step3 = (graph, newVIndex) => {
  * 4. Если в пару событий выходят только фиктивные работы и их начала попарно совпадают,
  * то эти события склеваются
  * */
-const step4 = (graph, newVIndex, newFicIndex) => {
+export const step4 = (graph, newVIndex, newFicIndex) => {
   const equalFictitiousIncomingNodes = groupBy(
     getVerticesWithOnlyFictitiousIncomingEdges(graph),
     "incomingNodes"
@@ -114,7 +112,7 @@ const step4 = (graph, newVIndex, newFicIndex) => {
  * 6. Если из начала фиктивной работы в её конец существует другой путь,
  * то эта работа убирается
  * */
-const step6 = (graph) => {
+export const step6 = (graph) => {
   graph.nodes().forEach((node) => {
     const adjNodes = graph.adjacent(node);
     if (adjNodes.length === 1 && graph.getEdgeWeight(node, adjNodes[0]) === 0) {
@@ -133,7 +131,7 @@ const step6 = (graph) => {
  * 7. Если из события выходит только одна работа и она фиктивная,
  * то её начало и конец склеиваются
  * */
-const step7 = (graph) => {
+export const step7 = (graph) => {
   graph.nodes().forEach((node) => {
     if (node.charAt(0) !== "F") {
       const adjNode = graph.adjacent(node)[0];
@@ -167,7 +165,7 @@ const step7 = (graph) => {
  * 8. Если в событие входит только одна работа и она фиктивная,
  * то её начало и конец склеиваются
  * */
-const step8 = (graph) => {
+export const step8 = (graph) => {
   graph.nodes().forEach((node) => {
     const incomingEdges = getIncomingEdges(graph, node);
 
@@ -194,7 +192,7 @@ const step8 = (graph) => {
   });
 };
 
-const joinStartEvents = (graph, newVIndex, newFicIndex) => {
+export const joinStartEvents = (graph, newVIndex, newFicIndex) => {
   const startEdges: Array<{ source: string; target: string[] }> = [];
   graph.nodes().forEach((node) => {
     const pred = getIncomingEdges(graph, node);
@@ -254,7 +252,7 @@ const joinStartEvents = (graph, newVIndex, newFicIndex) => {
   return [newVIndex, newFicIndex];
 };
 
-const joinEndEvents = (graph, newVIndex) => {
+export const joinEndEvents = (graph, newVIndex) => {
   const endNodes: any[] = [];
   graph.nodes().forEach((node) => {
     if (graph.adjacent(node).length === 0) {
@@ -287,80 +285,3 @@ const joinEndEvents = (graph, newVIndex) => {
   return [ newVIndex ];
 };
 
-const INITIAL_NEW_VERTEX_INDEX = 0;
-const INITIAL_FICTION_INDEX = 0;
-
-export interface IPipeParams {
-  pred: object;
-  graph: any;
-  newVIndex: number;
-  newFicIndex: number;
-}
-
-export function pipe1({ pred, graph, ...rest }: IPipeParams): IPipeParams {
-  addWorks(graph, pred);
-  addFictitiousWorks(graph, pred);
-
-  return { ...rest, pred, graph };
-}
-
-export function pipe2({ graph, newVIndex, ...rest }: IPipeParams): IPipeParams {
-  const [newVIndexUpdated] = step3(graph, newVIndex);
-
-  return { ...rest, graph, newVIndex: newVIndexUpdated };
-}
-
-export function pipe3({
-  graph,
-  newVIndex,
-  newFicIndex,
-  ...rest
-}: IPipeParams): IPipeParams {
-  const [newVIndexUpdated, newFicIndexUpdated] = step4(
-    graph,
-    newVIndex,
-    newFicIndex
-  );
-
-  return {
-    ...rest,
-    graph,
-    newVIndex: newVIndexUpdated,
-    newFicIndex: newFicIndexUpdated,
-  };
-}
-
-export function pipe4({ graph, ...rest }: IPipeParams): IPipeParams {
-  step6(graph);
-  step7(graph);
-  step8(graph);
-
-  return { ...rest, graph };
-}
-
-export function pipe5({ graph, newVIndex, newFicIndex, ...rest }: IPipeParams): IPipeParams {
-  const [newVIndexUpdated, newFicIndexUpdated] = joinStartEvents(graph, newVIndex, newFicIndex);
-  const [newVIndexUpdated2] = joinEndEvents(graph, newVIndexUpdated);
-  // console.log(graph.serialize());
-
-  return { ...rest, graph, newVIndex: newVIndexUpdated2, newFicIndex: newFicIndexUpdated };
-}
-
-export function createNetworkModel(pred, graph) {
-  const pipe1Params = pipe1({
-    pred,
-    graph,
-    newVIndex: INITIAL_NEW_VERTEX_INDEX,
-    newFicIndex: INITIAL_FICTION_INDEX,
-  });
-
-  const pipe2Params = pipe2(pipe1Params);
-
-  const pipe3Params = pipe3(pipe2Params);
-
-  const pipe4Params = pipe4(pipe3Params);
-
-  const {graph: resultGraph} = pipe5(pipe4Params);
-
-  return resultGraph;
-}

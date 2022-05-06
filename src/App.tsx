@@ -1,15 +1,40 @@
-import React, { ChangeEvent, useEffect, useState } from "react";
-import {default as GraphComponent } from "react-graph-vis";
-import { computeModel, createGraphView, createGraphViewNotFinal } from 'helpers/helpers';
-import { graphOptions } from 'helpers/options';
+import React, { ChangeEvent, useEffect, useRef, useState } from "react";
+import Graph from "graph-data-structure";
+import { default as GraphComponent } from "react-graph-vis";
+import {
+  computeModelParams,
+  createGraphView,
+  createGraphViewNotFinal,
+} from "helpers/helpers";
+import { graphOptions } from "helpers/options";
 import { GanttChart } from "components/GanttChart/GanttChart";
 import "./App.css";
-import { pipe1, pipe2, pipe3, pipe4, pipe5 } from 'algorithms/bakhtin';
-import Graph from 'graph-data-structure';
+import {
+  pipe1,
+  pipe2,
+  pipe3,
+  pipe4,
+  pipe5,
+  pipe6,
+  pipe7,
+} from "helpers/modelPipes";
 
 const INITIAL_JOBS_COUNT = 4;
 
+const wait = (button: HTMLElement | null) => {
+  return new Promise<void>((resolve) => {
+    const listener = () => {
+      resolve();
+      button?.removeEventListener("click", listener);
+    };
+
+    button?.addEventListener("click", listener);
+  });
+};
+
 function App() {
+  const networkRef = useRef<any>(null);
+  const buttonRef = useRef<HTMLButtonElement | null>(null);
   const [jobsCount, setJobsCount] = useState(INITIAL_JOBS_COUNT);
   const [nodesArray, setNodesArray] = useState<number[]>([]);
   const [durations, setDurations] = useState<{ [key: string]: number }>({});
@@ -83,61 +108,70 @@ function App() {
     setPredNodesInput({ ...predNodesInput, [target.name]: target.value });
   };
 
-  const onCreateModelClick = () => {
+  const onCreateModelClick = async () => {
     const tmpGraph = Graph();
-    let params = pipe1({graph: tmpGraph, pred: predNodes, newVIndex: 0, newFicIndex: 0 });
+    let params = pipe1({
+      graph: tmpGraph,
+      pred: predNodes,
+      newVIndex: 0,
+      newFicIndex: 0,
+    });
+    setGraphView(createGraphViewNotFinal(params.graph, durations, resources));
+    console.log("pipe1");
+
+    buttonRef.current!.style.visibility = "visible";
+    await wait(buttonRef.current);
+
+    params = pipe2(params);
+    setGraphView(createGraphViewNotFinal(params.graph, durations, resources));
+    console.log("pipe2");
+
+    await wait(buttonRef.current);
+
+    params = pipe3(params);
+    setGraphView(createGraphViewNotFinal(params.graph, durations, resources));
+    console.log("pipe3");
+
+    await wait(buttonRef.current);
+
+    params = pipe4(params);
+    setGraphView(createGraphViewNotFinal(params.graph, durations, resources));
+    console.log("pipe4");
+
+    await wait(buttonRef.current);
+
+    params = pipe5(params);
+    setGraphView(createGraphViewNotFinal(params.graph, durations, resources));
+    console.log("pipe5");
+
+    await wait(buttonRef.current);
+
+    params = pipe6(params);
+    setGraphView(createGraphViewNotFinal(params.graph, durations, resources));
+    console.log("pipe6");
+
+    await wait(buttonRef.current);
+    buttonRef.current!.style.visibility = "hidden";
+
+    params = pipe7(params);
     setGraphView(
-      createGraphViewNotFinal(
-        params.graph,
+      createGraphView(
+        ...computeModelParams(params.graph, durations),
         durations,
         resources
       )
     );
-
+    setChangesIndex((prevIndex) => prevIndex + 1);
+    // delay for apply after render
     setTimeout(() => {
-      params = pipe2(params);
-      setGraphView(
-        createGraphViewNotFinal(
-          params.graph,
-          durations,
-          resources
-        )
-      );
-    }, 2000);
-
-    setTimeout(() => {
-      params = pipe3(params);
-      setGraphView(
-        createGraphViewNotFinal(
-          params.graph,
-          durations,
-          resources
-        )
-      );
-    }, 4000);
-
-    setTimeout(() => {
-      params = pipe4(params);
-      setGraphView(
-        createGraphViewNotFinal(
-          params.graph,
-          durations,
-          resources
-        )
-      );
-    }, 6000);
-
-    setTimeout(() => {
-      params = pipe5(params);
-      setGraphView(
-        createGraphView(
-          ...computeModel(params, durations),
-          durations,
-          resources
-        )
-      );
-      setChangesIndex((prevIndex) => prevIndex + 1);
-    }, 8000);
+      networkRef.current?.setOptions({
+        ...graphOptions,
+        layout: {
+          hierarchical: false,
+        },
+      });
+    }, 10);
+    console.log("pipe7 - final");
   };
 
   useEffect(() => {
@@ -233,18 +267,29 @@ function App() {
           </button>
         </div>
 
-        {graphView && (
-          <div className="graph-wrapper">
-            <GraphComponent graph={graphView} options={graphOptions} />
-          </div>
-        )}
+        <div className="graph-wrapper">
+          <button
+            ref={buttonRef}
+            className="button button--primary button-square button-nextStep"
+          >
+            {"->"}
+          </button>
+          {graphView && (
+            <GraphComponent
+              graph={graphView}
+              options={graphOptions}
+              getNetwork={(network) => (networkRef.current = network)}
+            />
+          )}
+        </div>
+
         {graphView && (
           <GanttChart
             key={changesIndex}
             chartData={graphView.edges
               .map((edge) => edge.payload)
               .sort((a, b) => {
-                return Number(b.from.at(1)) - Number(a.from.at(1));
+                return Number(b.from.slice(1)) - Number(a.from.slice(1));
               })
               .sort((a, b) => {
                 return a.isOnCriticalPath - b.isOnCriticalPath;

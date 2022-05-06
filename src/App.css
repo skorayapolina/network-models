@@ -1,7 +1,10 @@
+body {
+  background-color: var(--color-layout-bg);
+}
+
 .app {
   color: var(--color-font);
   min-height: 100vh;
-  background-color: var(--color-layout-bg);
   padding: 0 4vw 2rem 4vw;
 }
 
@@ -42,14 +45,6 @@
   height: 1rem;
   display: table-row;
   content: '';
-}
-
-.thead-row {
-
-}
-
-.tbody {
-
 }
 
 .thead-data {
@@ -99,6 +94,7 @@
 }
 
 .graph-wrapper {
+  position: relative;
   margin-bottom: 3rem;
   border-radius: 8px;
   background-color: #fff;
@@ -109,4 +105,11 @@
   outline: none;
   border-radius: 8px;
   box-shadow: var(--shadow-input-focus);
+}
+
+.button-nextStep {
+  position: absolute;
+  visibility: hidden;
+  top: 4px;
+  right: -36px;
 }

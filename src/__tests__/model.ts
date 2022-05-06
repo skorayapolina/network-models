@@ -1,4 +1,6 @@
-import { computeModel } from "App";
+import Graph from 'graph-data-structure';
+import { computeModelParams } from 'helpers/helpers';
+import { createNetworkModel } from 'helpers/modelPipes';
 
 describe("Checks critical path and min time to complete project", () => {
   it("0.m", () => {
@@ -28,7 +30,8 @@ describe("Checks critical path and min time to complete project", () => {
       10: 5,
     };
 
-    const [graph, erlPoss, criticalPath, ltsPoss] = computeModel(testPredNodes, testDurations);
+    const model = createNetworkModel(testPredNodes, Graph());
+    const [graph, erlPoss, criticalPath, ltsPoss] = computeModelParams(model, testDurations);
 
     expect(criticalPath).toEqual(['P0', 'P1', 'P2', 'P4', 'P5', 'P6']);
     expect(Math.max(...Object.values(erlPoss))).toEqual(21);
@@ -63,7 +66,8 @@ describe("Checks critical path and min time to complete project", () => {
       11: 2
     };
 
-    const [graph, erlPoss, criticalPath, ltsPoss] = computeModel(testPredNodes, testDurations);
+    const model = createNetworkModel(testPredNodes, Graph());
+    const [graph, erlPoss, criticalPath, ltsPoss] = computeModelParams(model, testDurations);
 
     expect(criticalPath).toEqual(['P0', 'P1', 'P5', 'P6', 'P7']);
     expect(Math.max(...Object.values(erlPoss))).toEqual(30);
@@ -98,7 +102,8 @@ describe("Checks critical path and min time to complete project", () => {
       11: 3
     };
 
-    const [graph, erlPoss, criticalPath, ltsPoss] = computeModel(testPredNodes, testDurations);
+    const model = createNetworkModel(testPredNodes, Graph());
+    const [graph, erlPoss, criticalPath, ltsPoss] = computeModelParams(model, testDurations);
 
     expect(criticalPath).toEqual(['P0', 'P1', 'P4', 'P5', 'P7']);
     expect(Math.max(...Object.values(erlPoss))).toEqual(33);
@@ -147,7 +152,8 @@ describe("Checks critical path and min time to complete project", () => {
       11: 5
     };
 
-    const [graph, erlPoss, criticalPath, ltsPoss] = computeModel(testPredNodes, testDurations);
+    const model = createNetworkModel(testPredNodes, Graph());
+    const [graph, erlPoss, criticalPath, ltsPoss] = computeModelParams(model, testDurations);
 
     // expect(criticalPath).toEqual(['P0', 'P1', 'P3', 'P6', 'P7']);
     expect(criticalPath).toEqual(['P0', 'P1', 'P3', 'P5', 'P7']);
@@ -197,7 +203,8 @@ describe("Checks critical path and min time to complete project", () => {
       11: 8
     };
 
-    const [graph, erlPoss, criticalPath, ltsPoss] = computeModel(testPredNodes, testDurations);
+    const model = createNetworkModel(testPredNodes, Graph());
+    const [graph, erlPoss, criticalPath, ltsPoss] = computeModelParams(model, testDurations);
 
     expect(criticalPath).toEqual(['P0', 'P1', 'P5', 'P6']);
     expect(Math.max(...Object.values(erlPoss))).toEqual(22);
@@ -246,7 +253,8 @@ describe("Checks critical path and min time to complete project", () => {
       11: 4
     };
 
-    const [graph, erlPoss, criticalPath, ltsPoss] = computeModel(testPredNodes, testDurations);
+    const model = createNetworkModel(testPredNodes, Graph());
+    const [graph, erlPoss, criticalPath, ltsPoss] = computeModelParams(model, testDurations);
 
     // expect(criticalPath).toEqual(['P0', 'P1', 'P3', 'P4', 'P7']);
     expect(criticalPath).toEqual(['P0', 'P1', 'P2', 'P4', 'P7']);
@@ -296,9 +304,9 @@ describe("Checks critical path and min time to complete project", () => {
       11: 9
     };
 
-    const [graph, erlPoss, criticalPath, ltsPoss] = computeModel(testPredNodes, testDurations);
+    const model = createNetworkModel(testPredNodes, Graph());
+    const [graph, erlPoss, criticalPath, ltsPoss] = computeModelParams(model, testDurations);
 
-    // expect(criticalPath).toEqual(['P0', 'P1', 'P4', 'P6', 'P7']);
     expect(criticalPath).toEqual(['P0', 'P1', 'P3', 'P5', 'P7']);
     expect(Math.max(...Object.values(erlPoss))).toEqual(27);
   });
@@ -346,9 +354,9 @@ describe("Checks critical path and min time to complete project", () => {
       11: 4
     };
 
-    const [graph, erlPoss, criticalPath, ltsPoss] = computeModel(testPredNodes, testDurations);
+    const model = createNetworkModel(testPredNodes, Graph());
+    const [graph, erlPoss, criticalPath, ltsPoss] = computeModelParams(model, testDurations);
 
-    // expect(criticalPath).toEqual(['P0', 'P1', 'P4', 'P6', 'P7']);
     expect(criticalPath).toEqual(['P0', 'P1', 'P4', 'P6', 'P7']);
     expect(Math.max(...Object.values(erlPoss))).toEqual(28);
   });
@@ -396,9 +404,9 @@ describe("Checks critical path and min time to complete project", () => {
       11: 5
     };
 
-    const [graph, erlPoss, criticalPath, ltsPoss] = computeModel(testPredNodes, testDurations);
+    const model = createNetworkModel(testPredNodes, Graph());
+    const [graph, erlPoss, criticalPath, ltsPoss] = computeModelParams(model, testDurations);
 
-    // expect(criticalPath).toEqual(['P0', 'P1', 'P4', 'P5', 'P7']);
     expect(criticalPath).toEqual(['P0', 'P1', 'P4', 'P6', 'P7']);
     expect(Math.max(...Object.values(erlPoss))).toEqual(23);
   });
@@ -446,9 +454,9 @@ describe("Checks critical path and min time to complete project", () => {
       11: 3
     };
 
-    const [graph, erlPoss, criticalPath, ltsPoss] = computeModel(testPredNodes, testDurations);
+    const model = createNetworkModel(testPredNodes, Graph());
+    const [graph, erlPoss, criticalPath, ltsPoss] = computeModelParams(model, testDurations);
 
-    // expect(criticalPath).toEqual(['P0', 'P1', 'P4', 'P5', 'P7']);
     expect(criticalPath).toEqual(['P0', 'P1', 'P4', 'P6', 'P7']);
     expect(Math.max(...Object.values(erlPoss))).toEqual(31);
   });
@@ -496,7 +504,8 @@ describe("Checks critical path and min time to complete project", () => {
       11: 9
     };
 
-    const [graph, erlPoss, criticalPath, ltsPoss] = computeModel(testPredNodes, testDurations);
+    const model = createNetworkModel(testPredNodes, Graph());
+    const [graph, erlPoss, criticalPath, ltsPoss] = computeModelParams(model, testDurations);
 
     expect(criticalPath).toEqual(['P0', 'P2', 'P4', 'P6']);
     expect(Math.max(...Object.values(erlPoss))).toEqual(22);
@@ -524,8 +533,8 @@ describe("Checks critical path and min time to complete project", () => {
       4: 7
     };
 
-    const [graph, erlPoss, criticalPath, ltsPoss] = computeModel(testPredNodes, testDurations);
-
+    const model = createNetworkModel(testPredNodes, Graph());
+    const [graph, erlPoss, criticalPath, ltsPoss] = computeModelParams(model, testDurations);
     const graphSerialized = graph.serialize();
 
     expect(graphSerialized.nodes.length).toEqual(5);

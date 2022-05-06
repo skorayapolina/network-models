@@ -1,4 +1,3 @@
-import { IPipeParams, pipe5 } from 'algorithms/bakhtin';
 import { getMapToRename, rankingEvents } from 'algorithms/ranking';
 import { getGraphCopy } from 'algorithms/helpers';
 import { renameNodes } from 'algorithms/renameNodes';
@@ -6,14 +5,13 @@ import { getEarliestPossible, getEventDuration } from 'algorithms/earliestPossib
 import { findCriticalPath } from 'algorithms/findCriticalPath';
 import { getLatestPossible } from 'algorithms/latestPossible';
 
-export const computeModel = (
-  pipeParams: IPipeParams,
+export const computeModelParams = (
+  model,
   durations
 ): [graph: any, erlPoss: object, criticalPath: string[], ltsPoss: object] => {
-  const {graph: oldGraph} = pipe5(pipeParams);
-  const mapToRename = getMapToRename(rankingEvents(getGraphCopy(oldGraph)));
+  const mapToRename = getMapToRename(rankingEvents(getGraphCopy(model)));
 
-  const graph = renameNodes(oldGraph, mapToRename);
+  const graph = renameNodes(model, mapToRename);
   const ranking = rankingEvents(getGraphCopy(graph));
 
   const erlPoss = getEarliestPossible(graph, ranking, durations);
