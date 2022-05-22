@@ -1,10 +1,4 @@
-import React, {
-  ChangeEvent,
-  RefObject,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { ChangeEvent, useEffect, useRef, useState } from "react";
 import Graph from "graph-data-structure";
 import {
   computeModelParams,
@@ -16,6 +10,7 @@ import { graphOptions } from "helpers/options";
 import { GanttChart } from "components/GanttChart/GanttChart";
 import "./App.css";
 import {
+  IPipeParams,
   pipe1,
   pipe2,
   pipe3,
@@ -30,17 +25,6 @@ import { Table } from "components/Table/Table";
 
 const INITIAL_JOBS_COUNT = 4;
 
-const wait = (button: HTMLElement | null) => {
-  return new Promise<void>((resolve) => {
-    const listener = () => {
-      resolve();
-      button?.removeEventListener("click", listener);
-    };
-
-    button?.addEventListener("click", listener);
-  });
-};
-
 function App() {
   const networkRef = useRef<any>(null);
   const [jobsCount, setJobsCount] = useState(INITIAL_JOBS_COUNT);
@@ -50,6 +34,8 @@ function App() {
   const [predNodesInput, setPredNodesInput] = useState<PredNodesInput>({});
   const [visGraphData, setVisGraphData] = useState<any>(null);
   const [changesIndex, setChangesIndex] = useState(0);
+  const [modelSteps, setModelSteps] = useState<IPipeParams[]>([]);
+  const [modelStepIndex, setModelStepIndex] = useState(0);
 
   // usecallback?
   const initState = () => {
@@ -114,93 +100,72 @@ function App() {
     setPredNodesInput({ ...predNodesInput, [target.name]: target.value });
   };
 
-  const onCreateModelClick =
-    (buttonRef: RefObject<HTMLButtonElement>) => async () => {
-      if (networkRef.current) {
-        networkRef.current?.setOptions(graphOptions);
-      }
+  const onCreateModelClick = async () => {
+    if (networkRef.current) {
+      networkRef.current?.setOptions(graphOptions);
+    }
+    setModelStepIndex(0);
+    const initialParams = {
+      graph: Graph(),
+      pred: predNodes,
+      newVIndex: 0,
+      newFicIndex: 0,
+    };
+    const fns = [pipe1, pipe2, pipe3, pipe4, pipe5, pipe6, pipe7];
 
-      let params = pipe1({
-        graph: Graph(),
-        pred: predNodes,
-        newVIndex: 0,
-        newFicIndex: 0,
-      });
+    const modelSteps = fns.reduce((acc, fn, index) => {
+      const params = index === 0 ? initialParams : acc[index - 1];
+      const result = fn({ ...params, graph: Graph(params.graph.serialize()) });
+      return [...acc, result];
+    }, [] as IPipeParams[]);
+    setModelSteps(modelSteps);
+
+    setVisGraphData(
+      createGraphViewNotFinal(modelSteps[0].graph, durations, resources)
+    );
+  };
+
+  const onStepClick = (step: number) => {
+    const currentStep = modelStepIndex + step;
+    setModelStepIndex(currentStep);
+
+    if (currentStep !== modelSteps.length - 1) {
+      networkRef.current?.setOptions(graphOptions);
+
       setVisGraphData(
-        createGraphViewNotFinal(params.graph, durations, resources)
-      );
-      console.log("pipe1");
-
-      buttonRef.current!.style.visibility = "visible";
-      await wait(buttonRef.current);
-
-      params = pipe2(params);
-      setVisGraphData(
-        createGraphViewNotFinal(params.graph, durations, resources)
-      );
-      console.log("pipe2");
-
-      await wait(buttonRef.current);
-
-      params = pipe3(params);
-      setVisGraphData(
-        createGraphViewNotFinal(params.graph, durations, resources)
-      );
-      console.log("pipe3");
-
-      await wait(buttonRef.current);
-
-      params = pipe4(params);
-      setVisGraphData(
-        createGraphViewNotFinal(params.graph, durations, resources)
-      );
-      console.log("pipe4");
-
-      await wait(buttonRef.current);
-
-      params = pipe5(params);
-      setVisGraphData(
-        createGraphViewNotFinal(params.graph, durations, resources)
-      );
-      console.log("pipe5");
-
-      await wait(buttonRef.current);
-
-      params = pipe6(params);
-      setVisGraphData(
-        createGraphViewNotFinal(params.graph, durations, resources)
-      );
-      console.log("pipe6");
-
-      await wait(buttonRef.current);
-      buttonRef.current!.style.visibility = "hidden";
-
-      params = pipe7(params);
-      setVisGraphData(
-        createGraphView(
-          ...computeModelParams(params.graph, durations),
+        createGraphViewNotFinal(
+          modelSteps[currentStep].graph,
           durations,
           resources
         )
       );
-      setChangesIndex((prevIndex) => prevIndex + 1);
-      // delay in order to apply after render
-      setTimeout(() => {
-        networkRef.current?.setOptions({
-          ...graphOptions,
-          layout: {
-            hierarchical: false,
-          },
-        });
-      }, 10);
-      console.log("pipe7 - final");
-    };
+
+      return;
+    }
+
+    setVisGraphData(
+      createGraphView(
+        ...computeModelParams(modelSteps[currentStep].graph, durations),
+        durations,
+        resources
+      )
+    );
+    setChangesIndex((prevIndex) => prevIndex + 1);
+    // delay in order to apply after render
+    setTimeout(() => {
+      networkRef.current?.setOptions({
+        ...graphOptions,
+        layout: {
+          hierarchical: false,
+        },
+      });
+    }, 10);
+  };
 
   useEffect(() => {
     updateWorksCount();
   }, [jobsCount]);
 
-  // React Hook useEffect has a missing dependency: 'initState'.
   useEffect(() => {
     initState();
   }, []);
@@ -238,13 +203,18 @@ function App() {
             Очистить
           </button>
         </div>
-        <Table jobsCount={jobsCount} data={tableData}/>
+        <Table jobsCount={jobsCount} data={tableData} />
         <VisGraph
           onCreateModelClick={onCreateModelClick}
           getNetwork={(network) => (networkRef.current = network)}
           graphView={visGraphData}
+          steps={{
+            stepsLength: modelSteps.length,
+            currentStep: modelStepIndex,
+            onStepClick,
+          }}
         />
-        {visGraphData && (
+        {visGraphData && modelStepIndex === modelSteps.length - 1 && (
           <GanttChart
             key={changesIndex}
             chartData={getChartData(visGraphData)}

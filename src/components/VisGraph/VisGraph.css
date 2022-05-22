@@ -1,11 +1,11 @@
 .button-wrapper {
   text-align: right;
-  margin-bottom: 3rem;
+  margin-bottom: 6rem;
 }
 
 .graph-wrapper {
   position: relative;
-  margin-bottom: 3rem;
+  margin-bottom: 6rem;
   border-radius: 8px;
   background-color: #fff;
   box-shadow: var(--shadow-table);
@@ -17,9 +17,11 @@
   box-shadow: var(--shadow-input-focus);
 }
 
-.button-nextStep {
+.buttons {
   position: absolute;
-  visibility: hidden;
-  top: 4px;
-  right: -36px;
+  top: -40px;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }

@@ -32,7 +32,7 @@ export const GanttChart = ({ chartData }: { chartData: IChartData }) => {
   const [resourcesSum, setResourcesSum] = useState<number[]>([]);
   const [resourcesAxis, setResourcesAxis] = useState<number[]>([]);
   const [additionalTime, setAdditionalTime] = useState<number>(0);
-  // React Hook useMemo has a missing dependency: 'chartData'.
+
   const timeAxis = useMemo<number[]>(() => {
     const time =
       Math.max(...chartData.map((job) => job.end)) + additionalTime + 2;
